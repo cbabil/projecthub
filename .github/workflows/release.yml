@@ -11,15 +11,61 @@ on:
         required: false
 
 jobs:
-  create-release:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     permissions:
       contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Use Node 18
+        uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build app (electron-builder)
+        run: |
+          npx electron-builder \
+            --${{ matrix.os == 'macos-latest' && 'mac' || matrix.os == 'windows-latest' && 'win' || 'linux' }} \
+            --publish=never
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: projecthub-${{ matrix.os }}
+          path: release/**
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download macOS artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: projecthub-macos-latest
+          path: artifacts/macos
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: projecthub-windows-latest
+          path: artifacts/windows
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: projecthub-ubuntu-latest
+          path: artifacts/linux
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
@@ -29,5 +75,9 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: false
+          files: |
+            artifacts/macos/**
+            artifacts/windows/**
+            artifacts/linux/**
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
