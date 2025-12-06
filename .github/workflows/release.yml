@@ -38,10 +38,10 @@ jobs:
         run: yarn build
 
       - name: Build app (electron-builder)
+        shell: bash
         run: |
-          yarn electron-builder \
-            --${{ matrix.os == 'macos-latest' && 'mac' || matrix.os == 'windows-latest' && 'win' || 'linux' }} \
-            --publish=never
+          target=$(if [ "${{ matrix.os }}" = "macos-latest" ]; then echo mac; elif [ "${{ matrix.os }}" = "windows-latest" ]; then echo win; else echo linux; fi)
+          yarn electron-builder --${target} --publish=never
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
