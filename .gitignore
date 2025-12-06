@@ -19,6 +19,14 @@ pnpm-debug.log*
 .vscode/
 *.swp
 
+# Local backups / personal config
+.git.bak/
+.npmrc
+~/
+
+# Reports / coverage
+coverage/
+
 # OS
 .DS_Store
 Thumbs.db

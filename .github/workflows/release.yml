@@ -1,0 +1,37 @@
+name: Manual Release Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (for reference only)"
+        required: false
+        default: "manual-run"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint and typecheck
+        run: yarn lint && yarn typecheck
+
+      - name: Build
+        run: yarn build
+
+      - name: Upload artifacts (dist)
+        uses: actions/upload-artifact@v4
+        with:
+          name: projecthub-dist
+          path: dist/**

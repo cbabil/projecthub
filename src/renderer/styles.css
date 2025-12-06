@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Dark theme single-tone base from projecthub_old */
+  --color-bg-dark: #0f172a;
+  --color-surface-dark: #0f172a;
+  --color-text-dark: #e2e8f0;
+  --color-divider: #1f2937;
+
+  /* Light fallback */
+  --color-bg-light: #f7f7fa;
+  --color-surface-light: #ffffff;
+  --color-text-light: #111827;
+
+  --color-accent-primary: #6a5acd;
+  --color-accent-boost: #4f46e5;
+  --color-accent-blue: #4c6ef5;
+  --color-accent-green: #23ce6b;
+  --color-accent-red: #ef4444;
+}
+
+.light {
+  --color-bg-dark: #f7f7fa;
+  --color-surface-dark: #ffffff;
+  --color-text-dark: #111827;
+  --color-divider: #d1d5db;
+}
+
+body {
+  @apply bg-brand-bg-dark text-brand-text-dark;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.app-surface {
+  @apply bg-brand-surface-dark text-brand-text-dark shadow-lg rounded-xl border border-brand-divider border-opacity-40;
+}
+
+.button-primary {
+  @apply bg-brand-accent-primary text-white px-3 py-2 rounded-md hover:bg-brand-accent-boost transition;
+}
+
+.input {
+  @apply bg-brand-surface-dark border border-brand-divider border-opacity-60 rounded-md px-3 py-2 text-sm focus:outline-none focus:border-brand-accent-primary;
+}
+
+.titlebar {
+  -webkit-app-region: drag;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+.grid-row {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.grid-row:hover {
+  background-color: color-mix(in srgb, var(--color-accent-primary) 18%, transparent);
+}
+
+.grid-row--selected {
+  background-color: color-mix(in srgb, var(--color-accent-primary) 32%, transparent);
+}
