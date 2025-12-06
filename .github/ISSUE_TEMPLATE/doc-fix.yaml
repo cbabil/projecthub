@@ -1,0 +1,23 @@
+name: Documentation fix
+description: Suggest a doc update or correction
+labels: [documentation]
+title: "[Docs] "
+body:
+  - type: textarea
+    id: location
+    attributes:
+      label: Location
+      description: Page or file that needs an update.
+    validations:
+      required: true
+  - type: textarea
+    id: change
+    attributes:
+      label: What to change
+      description: Be specific about the fix or addition.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
