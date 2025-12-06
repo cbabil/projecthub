@@ -2,6 +2,7 @@
   "name": "projecthub",
   "version": "1.0.0",
   "description": "ProjectHub Electron app",
+  "author": "cbabil",
   "packageManager": "yarn@1.22.22",
   "main": "dist/main/index.cjs",
   "type": "module",

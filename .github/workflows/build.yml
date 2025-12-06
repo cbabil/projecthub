@@ -26,6 +26,9 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
+      - name: Build renderer/main
+        run: yarn build
+
       - name: Build app (electron-builder)
         run: |
           yarn electron-builder \
