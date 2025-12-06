@@ -74,16 +74,25 @@ jobs:
           path: artifacts/linux
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.event.inputs.tag }}
-          name: ${{ github.event.inputs.name || github.event.inputs.tag }}
-          generate_release_notes: true
-          draft: false
-          prerelease: false
-          files: |
-            artifacts/macos/**
-            artifacts/windows/**
-            artifacts/linux/**
+        shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.inputs.tag }}
+          RELEASE_NAME: ${{ github.event.inputs.name || github.event.inputs.tag }}
+        run: |
+          set -euo pipefail
+          # Collect files
+          mapfile -t files < <(find artifacts -type f)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No artifacts found to upload" >&2
+            exit 1
+          fi
+          # If release exists, delete to recreate (idempotent)
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release delete "$TAG" -y
+          fi
+          gh release create "$TAG" "${files[@]}" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "$RELEASE_NAME" \
+            --notes "Automated release from workflow" \
+            --latest
