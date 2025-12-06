@@ -4,8 +4,8 @@ import path from 'path';
 const home = os.homedir();
 export const ROOT_DIR = path.join(home, '.projecthub');
 export const SETTINGS_PATH = path.join(ROOT_DIR, 'settings.local.json');
-export const TEMPLATES_DIR = path.join(ROOT_DIR, 'templates'); // legacy, may be empty when packs are used
-export const LIBRARIES_DIR = path.join(ROOT_DIR, 'libraries'); // legacy
+export const TEMPLATES_DIR = path.join(ROOT_DIR, 'templates'); // legacy only
+export const LIBRARIES_DIR = path.join(ROOT_DIR, 'libraries'); // legacy only
 export const PROJECTS_DIR = path.join(ROOT_DIR, 'projects');
 export const PACKS_DIR = path.join(ROOT_DIR, 'packs');
 
@@ -27,8 +27,7 @@ export const DEFAULT_TITLEBAR = {
 export const DEFAULT_SETTINGS = {
   installPath: ROOT_DIR,
   projectsPath: PROJECTS_DIR,
-  templatesPath: TEMPLATES_DIR,
-  librariesPath: LIBRARIES_DIR,
+  packsPath: PACKS_DIR,
   // Default to the latest GitHub release so new pack ZIPs are discovered automatically
   packsRepoUrl: 'https://github.com/cbabil/projecthub-packs/releases/latest',
   trace: 'info',
