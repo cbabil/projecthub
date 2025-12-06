@@ -1,37 +1,33 @@
-name: Manual Release Build
+name: Manual Release
 
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: "Release version (for reference only)"
+      tag:
+        description: "Release tag (e.g., v1.0.0)"
+        required: true
+      name:
+        description: "Release name (defaults to tag)"
         required: false
-        default: "manual-run"
 
 jobs:
-  build:
+  create-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: yarn
+          fetch-depth: 0
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Lint and typecheck
-        run: yarn lint && yarn typecheck
-
-      - name: Build
-        run: yarn build
-
-      - name: Upload artifacts (dist)
-        uses: actions/upload-artifact@v4
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
         with:
-          name: projecthub-dist
-          path: dist/**
+          tag_name: ${{ github.event.inputs.tag }}
+          name: ${{ github.event.inputs.name || github.event.inputs.tag }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
