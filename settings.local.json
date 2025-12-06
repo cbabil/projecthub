@@ -1,0 +1,10 @@
+{
+  "installPath": "~/.projecthub",
+  "projectsPath": "~/.projecthub/projects",
+  "templatesPath": "~/.projecthub/templates",
+  "librariesPath": "~/.projecthub/libraries",
+  "packsRepoUrl": "https://github.com/cbabil/projecthub-packs/releases/latest",
+  "trace": "info",
+  "theme": "dark",
+  "language": "en"
+}
