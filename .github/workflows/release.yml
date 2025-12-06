@@ -73,6 +73,26 @@ jobs:
           name: projecthub-ubuntu-latest
           path: artifacts/linux
 
+      - name: Bundle artifacts per OS
+        shell: bash
+        env:
+          TAG: ${{ github.event.inputs.tag }}
+        run: |
+          set -euo pipefail
+          rm -rf upload && mkdir -p upload
+          bundle() {
+            local src="$1"; local label="$2"
+            if [ -d "$src" ]; then
+              # Remove previous zips inside src to avoid double-packaging
+              find "$src" -maxdepth 1 -type f -name '*.zip' -delete
+              local out="upload/projecthub-${label}-${TAG}.zip"
+              (cd "$src" && zip -r "${PWD}/$out" .)
+            fi
+          }
+          bundle artifacts/macos macos
+          bundle artifacts/windows windows
+          bundle artifacts/linux linux
+
       - name: Create GitHub Release
         shell: bash
         env:
@@ -81,10 +101,9 @@ jobs:
           RELEASE_NAME: ${{ github.event.inputs.name || github.event.inputs.tag }}
         run: |
           set -euo pipefail
-          # Collect files
-          mapfile -t files < <(find artifacts -type f)
+          mapfile -t files < <(find upload -maxdepth 1 -type f -name '*.zip' | sort)
           if [ ${#files[@]} -eq 0 ]; then
-            echo "No artifacts found to upload" >&2
+            echo "No packaged artifacts found to upload" >&2
             exit 1
           fi
           # If release exists, delete it (and the tag) to avoid duplicate assets
