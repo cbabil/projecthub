@@ -73,6 +73,31 @@ jobs:
           name: projecthub-ubuntu-latest
           path: artifacts/linux
 
+      - name: Prepare upload zips (one per OS)
+        shell: bash
+        env:
+          TAG: ${{ github.event.inputs.tag }}
+        run: |
+          set -euo pipefail
+          rm -rf upload && mkdir -p upload
+          pack() {
+            local src="$1"; local label="$2"; local pattern="$3"
+            if [ ! -d "$src" ]; then
+              echo "Skipping $label: no artifacts directory" >&2
+              return
+            fi
+            mapfile -t installers < <(find "$src" -maxdepth 3 -type f -iname "$pattern")
+            if [ ${#installers[@]} -eq 0 ]; then
+              echo "Skipping $label: no installer matching $pattern" >&2
+              return
+            fi
+            local out="upload/ProjectHub-${label}-${TAG}.zip"
+            zip -j "$out" "${installers[@]}"
+          }
+          pack artifacts/macos macos "*.dmg"
+          pack artifacts/windows windows "*setup*.exe"
+          pack artifacts/linux linux "*.appimage"
+
       - name: Create GitHub Release
         shell: bash
         env:
@@ -81,8 +106,7 @@ jobs:
           RELEASE_NAME: ${{ github.event.inputs.name || github.event.inputs.tag }}
         run: |
           set -euo pipefail
-          mapfile -t files < <(find artifacts -type f \( \
-            -iname '*.dmg' -o -iname '*setup*.exe' -o -iname '*.exe' -o -iname '*.appimage' -o -iname '*.zip' -o -iname '*.tar.gz' -o -iname '*.tar.xz' \) | sort)
+          mapfile -t files < <(find upload -maxdepth 1 -type f -name '*.zip' | sort)
           if [ ${#files[@]} -eq 0 ]; then
             echo "No packaged artifacts found to upload" >&2
             exit 1
@@ -95,5 +119,5 @@ jobs:
           gh release create "$TAG" "${files[@]}" \
             --repo "$GITHUB_REPOSITORY" \
             --title "$RELEASE_NAME" \
-            --notes "Automated release from workflow" \
+            --generate-notes \
             --latest
