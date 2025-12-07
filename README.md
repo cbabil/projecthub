@@ -1,9 +1,11 @@
-<table align="center" border="0" cellspacing="0" cellpadding="6">
-  <tr>
-    <td align="center" valign="middle"><img src="assets/projecthub.png" alt="ProjectHub" width="1024"></td>
-    <td align="left" valign="middle"><em>ProjectHub desktop app: install packs, choose templates and libraries, and spin up projects locally.</em></td>
-  </tr>
-</table>
+<p>
+  <img src="assets/projecthub.png" alt="ProjectHub" width="320" align="left" style="margin-right:20px;margin-top:10px">
+  <em><br>ProjectHub desktop app: install packs, choose templates and libraries, and spin up projects locally.</em>
+</p>
+
+<br clear="both">
+
+<br>
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
