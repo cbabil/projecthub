@@ -15,6 +15,11 @@
 
 
 ## Get the App
+
+<p align="center">
+  <img src="assets/Screenshot_projecthub.png" alt="ProjectHub screenshot" width="700">
+</p>
+
 - Download the latest release for your OS from GitHub Releases.
 - Windows: run the installer `.exe`.
 - macOS: open the `.dmg` and drag ProjectHub to Applications.
