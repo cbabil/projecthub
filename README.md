@@ -1,7 +1,9 @@
-<p align="center" style="display:flex; align-items:center; justify-content:center; gap:20px;">
-  <img src="assets/projecthub.png" alt="ProjectHub" width="300">
-  <span style="font-size:1.05rem;"><em>Desktop ProjectHub app for creating and managing projects locally—templates, libraries, and projects in one place.</em></span>
-</p>
+<table align="center">
+  <tr>
+    <td style="padding-right:20px; vertical-align:middle;"><img src="assets/projecthub.png" alt="ProjectHub" width="1024"></td>
+    <td style="vertical-align:middle; font-size:1.1rem; line-height:1.5;"><em>ProjectHub desktop app: install packs, choose templates and libraries, and spin up projects locally.</em></td>
+  </tr>
+</table>
 
 [![Contributors][contributors-shield]][contributors-url]
 [![Forks][forks-shield]][forks-url]
