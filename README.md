@@ -1,8 +1,6 @@
-# ProjectHub
-
-<p align="center" style="display:flex; align-items:center; justify-content:center; gap:16px;">
-  <img src="assets/projecthub.png" alt="ProjectHub" width="140">
-  <span><em>Desktop ProjectHub app for creating and managing projects locally—templates, libraries, and projects in one place.</em></span>
+<p align="center" style="display:flex; align-items:center; justify-content:center; gap:20px;">
+  <img src="assets/projecthub.png" alt="ProjectHub" width="300">
+  <span style="font-size:1.05rem;"><em>Desktop ProjectHub app for creating and managing projects locally—templates, libraries, and projects in one place.</em></span>
 </p>
 
 [![Contributors][contributors-shield]][contributors-url]
