@@ -98,6 +98,15 @@ jobs:
           pack artifacts/windows windows "*setup*.exe"
           pack artifacts/linux linux "*.appimage"
 
+      - name: Compose release notes
+        shell: bash
+        env:
+          TAG: ${{ github.event.inputs.tag }}
+        run: |
+          notes=$(< .github/release-notes-template.md)
+          notes=${notes//{{TAG}}/$TAG}
+          printf "%s\n" "$notes" > release-notes.md
+
       - name: Create GitHub Release
         shell: bash
         env:
@@ -119,5 +128,5 @@ jobs:
           gh release create "$TAG" "${files[@]}" \
             --repo "$GITHUB_REPOSITORY" \
             --title "$RELEASE_NAME" \
-            --generate-notes \
+            --notes-file release-notes.md \
             --latest
