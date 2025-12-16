@@ -20,9 +20,9 @@ const api = {
   removePack: (payload: { name: string; path?: string }) =>
     ipcRenderer.invoke('filesystem:removePack', payload) as Promise<OperationResult<null>>,
   clearPacksCache: () => ipcRenderer.invoke('filesystem:clearPacksCache') as Promise<OperationResult<null>>,
-  fetchManifest: (url: string) => ipcRenderer.invoke('packs:fetchManifest', url) as Promise<OperationResult<any>>,
+  fetchManifest: (url: string) => ipcRenderer.invoke('packs:fetchManifest', url) as Promise<OperationResult<unknown>>,
   createProject: (fileName: string, payload: ProjectMeta) => ipcRenderer.invoke('filesystem:writeJson', fileName, payload) as Promise<OperationResult<ProjectMeta>>,
-  createProjectFromTemplates: (payload: { name: string; destination: string; templates: TemplateMeta[]; libraries: string[]; description?: string }) =>
+  createProjectFromTemplates: (payload: { name: string; version?: string; destination: string; templates: TemplateMeta[]; libraries: string[]; description?: string }) =>
     ipcRenderer.invoke('filesystem:createProjectFromTemplates', payload) as Promise<OperationResult<ProjectMeta>>,
   deleteTemplate: (relativePath: string) => ipcRenderer.invoke('filesystem:deleteTemplate', relativePath) as Promise<OperationResult<null>>,
   deleteProject: (payload: { relativePath: string; folderPath?: string }) =>
@@ -43,10 +43,10 @@ const api = {
     return () => ipcRenderer.removeListener(channel, handler);
   },
   ipc: {
-    on: (channel: string, listener: (...args: any[]) => void) => ipcRenderer.on(channel, (_event, ...args) => listener(...args)),
+    on: (channel: string, listener: (...args: unknown[]) => void) => ipcRenderer.on(channel, (_event, ...args) => listener(...args)),
     removeAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel)
   },
-  log: (level: 'log' | 'info' | 'warn' | 'error' | 'debug', ...args: any[]) => ipcRenderer.invoke('log:renderer', level, ...args),
+  log: (level: 'log' | 'info' | 'warn' | 'error' | 'debug', ...args: unknown[]) => ipcRenderer.invoke('log:renderer', level, ...args),
   logCacheFilter: (category: string | undefined, count: number) => ipcRenderer.invoke('cache:filter-log', { category, count })
 };
 

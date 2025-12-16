@@ -31,6 +31,14 @@ vi.mock('../src/renderer/context/DataContext.js', () => ({
   useData: () => dataState
 }));
 
+// Mock ToastContext
+const mockAddToast = vi.fn();
+vi.mock('../src/renderer/context/ToastContext.js', () => ({
+  useToast: () => mockAddToast,
+  useToasts: () => ({ toasts: [], removeToast: vi.fn() }),
+  ToastProvider: ({ children }: { children: React.ReactNode }) => children
+}));
+
 if (!('projecthub' in window)) {
   (window as any).projecthub = {};
 }
@@ -41,7 +49,6 @@ if (!('projecthub' in window)) {
 (window.projecthub as any).ipc = { on: vi.fn(), removeAllListeners: vi.fn() };
 // ensure confirm exists for tests
 if (!window.confirm) window.confirm = (() => true) as any;
-if (!window.alert) window.alert = (() => undefined) as any;
 
 beforeEach(() => {
   dataState.filteredTemplates = [];
@@ -54,7 +61,7 @@ beforeEach(() => {
   (window.projecthub.ipc.on as any).mockClear();
   (window.projecthub.ipc.removeAllListeners as any).mockClear();
   vi.spyOn(window, 'confirm').mockReturnValue(true);
-  vi.spyOn(window, 'alert').mockImplementation(() => undefined);
+  mockAddToast.mockClear();
 });
 
 describe('Templates page empty state', () => {
@@ -192,7 +199,7 @@ describe('Templates page actions and headers', () => {
     expect(editBtn).toBeDisabled();
   });
 
-  it('shows alert when deleting without a sourcePath', async () => {
+  it('shows toast when deleting without a sourcePath', async () => {
     const user = userEvent.setup();
     dataState.filteredTemplates = [
       {
@@ -206,7 +213,7 @@ describe('Templates page actions and headers', () => {
     ];
     render(<Templates />);
     await user.click(screen.getByLabelText('Delete template'));
-    expect(window.alert).toHaveBeenCalledWith('Template path unknown; cannot delete.');
+    expect(mockAddToast).toHaveBeenCalledWith('Template path unknown; cannot delete.', 'error');
     expect(window.projecthub.deleteTemplate).not.toHaveBeenCalled();
   });
 

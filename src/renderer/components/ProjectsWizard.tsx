@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { TranslationKeys } from '../../i18n';
@@ -6,6 +5,7 @@ import { useTranslation } from '../context/TranslationContext.js';
 import { useProjectsWizard } from '../hooks/useProjectsWizard.js';
 import ProjectsWizardContent from './ProjectsWizardContent.js';
 import ProjectsWizardFooter from './ProjectsWizardFooter.js';
+import { buildBasicsProps, buildLibrariesProps, buildReviewProps, buildTemplateProps } from './ProjectsWizardProps.js';
 import StepperProgress from './StepperProgress.js';
 
 interface Props {
@@ -78,6 +78,19 @@ const ProjectsWizard: React.FC<Props> = ({ onClose, onCreated }) => {
     }
   };
 
+  const basicsProps = buildBasicsProps(t, {
+    name, version, destination, setName, setVersion, pickLocation, showError: showBasicsError
+  });
+  const templateProps = buildTemplateProps(t, {
+    templates, selected: selectedTemplates, onSelectionChange: onTemplateSelectionChange, showError: showTemplateError
+  });
+  const librariesProps = buildLibrariesProps(t, {
+    libraries: filteredLibraries, selected: selectedLibs, query: libQuery, onQueryChange: setLibQuery, onToggle: toggleLibrary
+  });
+  const reviewProps = buildReviewProps(t, {
+    name, version, destination, templates: selectedTemplateObjects, libraries: selectedLibs
+  });
+
   return (
     <div className="space-y-6 flex flex-col h-full">
       <div className="shrink-0">
@@ -86,64 +99,10 @@ const ProjectsWizard: React.FC<Props> = ({ onClose, onCreated }) => {
       <div className="flex-1 min-h-0 pr-1 pt-3 sm:pt-5">
         <ProjectsWizardContent
           step={step}
-          basics={{
-            name,
-            version,
-            destination,
-            onNameChange: setName,
-            onVersionChange: setVersion,
-            onPickLocation: pickLocation,
-            showError: showBasicsError,
-            labels: {
-              name: t('wizardProjectName'),
-              version: t('wizardReviewVersion'),
-              destination: t('wizardDestinationPath'),
-              error: t('wizardBasicsError') ?? 'Name, version, and destination are required.',
-              choose: t('wizardChooseFolder') ?? 'Choose…'
-            }
-          }}
-          template={{
-            templates,
-            selected: selectedTemplates,
-            onSelectionChange: onTemplateSelectionChange,
-            errorText: t('wizardTemplateError') ?? 'Select a template.',
-            showError: showTemplateError,
-            labels: {
-              name: t('wizardTemplateGridName') ?? 'Name',
-              description: t('wizardTemplateGridDescription') ?? 'Description',
-              emptyTitle: t('templatesEmptyTitle') ?? 'No templates',
-              emptyMessage: t('templatesEmptyMessage') ?? 'Add template JSON files to ~/.projecthub/templates',
-              searchPlaceholder: t('wizardTemplateSearchPlaceholder') ?? 'Search templates',
-              pageLabel: t('wizardTemplatePageLabel') ?? 'Page {current} of {total}',
-              prev: t('wizardBack'),
-              next: t('wizardNext')
-            }
-          }}
-          libraries={{
-            libraries: filteredLibraries,
-            selected: selectedLibs,
-            query: libQuery,
-            onQueryChange: setLibQuery,
-            onToggle: toggleLibrary,
-            emptyTitle: t('librariesEmptyTitle'),
-            emptyMessage: t('librariesEmptyMessage'),
-            searchPlaceholder: t('wizardFilterLibraries')
-          }}
-          review={{
-            name,
-            version,
-            destination,
-            templates: selectedTemplateObjects,
-            libraries: selectedLibs,
-            labels: {
-              name: t('wizardReviewName'),
-              template: t('wizardReviewTemplate'),
-              version: t('wizardReviewVersion'),
-              installTree: t('wizardReviewDestination'),
-              libraries: t('wizardReviewLibraries'),
-              none: t('wizardReviewNone')
-            }
-          }}
+          basics={basicsProps}
+          template={templateProps}
+          libraries={librariesProps}
+          review={reviewProps}
         />
       </div>
       <div className="shrink-0">

@@ -3,10 +3,10 @@ import { ArrowUpDown, LucideIcon } from 'lucide-react';
 import React, { useMemo } from 'react';
 
 import type { GridColumn } from '../hooks/useDataGrid.js';
-import { formatDate, truncate } from '../utils/text.js';
 import DataGrid from './DataGrid.js';
 import type { DataGridProps } from './DataGrid.types.js';
 import EmptyState from './EmptyState.js';
+import { buildDefaultColumns } from './GridColumns.js';
 
 interface Props<T extends BaseMeta> {
   items: T[];
@@ -47,58 +47,10 @@ const Grid = <T extends BaseMeta>({
   enablePagination = true,
   searchInsideCard = true
 }: Props<T>) => {
-  const columns = useMemo(() => {
-    if (overrideColumns) return overrideColumns;
-    const base: GridColumn<T>[] = [
-      { id: 'name', label: 'Name', accessor: (row) => row.name, sortable: true, sortValue: (row) => row.name, width: 'minmax(180px, 1.4fr)' },
-      {
-        id: 'description',
-        label: 'Description',
-        accessor: (row) => truncate(row.description),
-        sortable: true,
-        sortValue: (row) => row.description,
-        width: 'minmax(320px, 2.4fr)'
-      },
-      {
-        id: 'category',
-        label: 'Category',
-        accessor: (row) => renderCategory?.(row) ?? '',
-        sortable: true,
-        sortValue: (row) => renderCategory?.(row) ?? '',
-        width: 'minmax(160px, 1.2fr)'
-      },
-      {
-        id: 'version',
-        label: 'Version',
-        accessor: (row) => (row as any).version ?? '—',
-        sortable: true,
-        sortValue: (row) => (row as any).version ?? '',
-        width: 'minmax(90px, 0.9fr)'
-      },
-      {
-        id: 'releasedOn',
-        label: 'Released On',
-        accessor: (row) => formatDate((row as any).releasedOn ?? row.lastEdited ?? (row as any).updatedAt),
-        sortable: true,
-        sortValue: (row) => (row as any).releasedOn ?? row.lastEdited ?? (row as any).updatedAt ?? '',
-        width: 'minmax(180px, 1.2fr)'
-      }
-    ];
-    if (!renderActions) return base;
-    return [
-      ...base,
-      {
-        id: 'actions',
-        label: 'Actions',
-        accessor: (row) => (
-          <div className="flex justify-end" onClick={(e) => e.stopPropagation()}>
-            {renderActions(row)}
-          </div>
-        ),
-        width: '72px'
-      }
-    ];
-  }, [overrideColumns, renderActions, renderCategory]);
+  const columns = useMemo(
+    () => (overrideColumns ? overrideColumns : buildDefaultColumns(renderCategory, renderActions)),
+    [overrideColumns, renderActions, renderCategory]
+  );
 
   const filterRows = (row: T, query: string) => {
     if (!query.trim()) return true;

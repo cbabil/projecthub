@@ -25,7 +25,7 @@ const libraries = [{ name: 'lib-one' }];
 const updateMock = vi.fn().mockResolvedValue(undefined);
 
 vi.mock('../src/renderer/context/DataContext.js', () => ({
-  useData: () => ({ templates, libraries })
+  useData: () => ({ templates, libraries, refreshAll: vi.fn().mockResolvedValue(undefined) })
 }));
 
 vi.mock('../src/renderer/context/SettingsContext.js', () => ({
@@ -48,6 +48,7 @@ describe('useProjectsWizard', () => {
     expect(result.current.step).toBe(0);
 
     act(() => result.current.setName('My Project'));
+    act(() => result.current.setVersion('1.0.0'));
     act(() => result.current.goNext()); // move to template step
     act(() => result.current.goNext()); // should block and mark template touched
     expect(result.current.templateTouched).toBe(true);
@@ -75,6 +76,7 @@ describe('useProjectsWizard', () => {
 
     await act(async () => {
       result.current.setName('Awesome');
+      result.current.setVersion('1.0.0');
       result.current.onTemplateSelectionChange(['tpl-1']);
     });
 
@@ -101,6 +103,7 @@ describe('useProjectsWizard', () => {
     const { result } = renderHook(() => useProjectsWizard());
     await act(async () => {
       result.current.setName('Oops');
+      result.current.setVersion('1.0.0');
       result.current.onTemplateSelectionChange(['tpl-2']);
     });
     const res = await act(async () => result.current.createProject());

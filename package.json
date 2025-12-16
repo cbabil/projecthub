@@ -1,7 +1,7 @@
 {
   "name": "projecthub",
-  "version": "0.0.1",
-  "description": "ProjectHub Electron app",
+  "version": "0.0.2",
+  "description": "ProjectHub",
   "author": "cbabil",
   "packageManager": "yarn@1.22.22",
   "main": "dist/main/index.cjs",
@@ -17,7 +17,8 @@
     "typecheck": "tsc --project tsconfig.tests.json --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "prepare": "husky"
   },
   "build": {
     "appId": "com.projecthub.app",
@@ -49,7 +50,6 @@
     "yaml": "2.4.5"
   },
   "devDependencies": {
-    "electron": "^28.1.0",
     "@testing-library/dom": "10.4.1",
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.0",
@@ -58,11 +58,12 @@
     "@types/node": "^22.7.4",
     "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
-    "@typescript-eslint/eslint-plugin": "^7.17.0",
-    "@typescript-eslint/parser": "^7.17.0",
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
     "@vitejs/plugin-react": "^4.3.2",
     "@vitest/coverage-v8": "4.0.13",
     "autoprefixer": "^10.4.20",
+    "electron": "^28.1.0",
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",
     "eslint": "^8.57.1",
@@ -70,6 +71,7 @@
     "eslint-plugin-react": "^7.35.0",
     "eslint-plugin-react-hooks": "^5.1.0-next-91b6e5df0-20230705",
     "eslint-plugin-simple-import-sort": "^10.0.0",
+    "husky": "^9.1.7",
     "jsdom": "27.2.0",
     "postcss": "^8.4.41",
     "prettier": "^3.3.3",

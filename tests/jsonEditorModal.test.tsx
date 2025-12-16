@@ -14,7 +14,7 @@ describe('EditorModal', () => {
 
     const textarea = screen.getByRole('textbox');
     await user.clear(textarea);
-    await user.paste('foo: baz');
+    await user.type(textarea, 'foo: baz');
     await user.click(screen.getByText('Save'));
     expect(onSave).toHaveBeenCalledWith('foo: baz');
     expect(onClose).toHaveBeenCalled();

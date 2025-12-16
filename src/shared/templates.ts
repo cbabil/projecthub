@@ -17,13 +17,13 @@ const coerceLines = (value?: unknown) => {
 };
 
 export function normalizeTemplate(template: TemplateMeta): NormalizedTemplate {
-  const id = (template as any).id ?? template.name;
+  const id = template.id ?? template.name;
   const name = template.name;
   const category = template.category ?? 'other';
 
-  if ((template as any).packPath) {
+  if (template.packPath) {
     const files = template.structure?.files;
-    return { kind: 'pack', id, name, packPath: (template as any).packPath, files };
+    return { kind: 'pack', id, name, packPath: template.packPath, files };
   }
 
   if (category === 'workspace') {
@@ -44,10 +44,6 @@ export function normalizeTemplate(template: TemplateMeta): NormalizedTemplate {
     const filename = template.fileName || hinted || '.env';
     const lines = coerceLines(template.content ?? template.structure?.files?.[filename]);
     return { kind: 'env', id, name, filename, lines };
-  }
-
-  if ((template as any).packPath) {
-    return { kind: 'pack', id, name, packPath: (template as any).packPath };
   }
 
   return { kind: 'other', id, name };

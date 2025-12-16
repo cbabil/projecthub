@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { fetchPackList } from '../src/renderer/utils/packs.js';
 
-type ManifestResult = { ok: boolean; data?: any; error?: string };
+type ManifestResult = { ok: boolean; data?: unknown; error?: string };
 
 const releaseUrl = 'https://github.com/example/projecthub-packs/releases/latest';
 
@@ -34,8 +34,7 @@ const mockManifest = {
 const calls: string[] = [];
 
 // Minimal mock of the preload bridge used by fetchPackList
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(globalThis as any).window = {
+(globalThis as unknown as { window: { projecthub: { fetchManifest: (url: string) => Promise<ManifestResult> } } }).window = {
   projecthub: {
     fetchManifest: async (url: string): Promise<ManifestResult> => {
       calls.push(url);

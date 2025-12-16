@@ -1,4 +1,3 @@
-/* eslint-disable max-lines, max-lines-per-function */
 import type { Settings } from '@shared/types';
 import React, { useEffect, useState } from 'react';
 

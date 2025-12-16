@@ -47,8 +47,8 @@ const shouldWriteFile = async (
       if (sticky === 'skip') shouldWrite = false;
       if (sticky === 'cancel') throw new Error('cancelled');
     }
-  } catch (err: any) {
-    if (err?.message === 'cancelled') throw err;
+  } catch (err: unknown) {
+    if (err instanceof Error && err.message === 'cancelled') throw err;
     // file does not exist -> proceed
   }
   return shouldWrite;

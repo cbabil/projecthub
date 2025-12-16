@@ -75,23 +75,27 @@ export const useProjectsWizard = () => {
       return { ok: false, error: 'Invalid state' };
     }
 
-    const templateValue = selectedTemplates;
-    const chosenTemplates = templates.filter((tpl) => templateValue.includes(tpl.id ?? tpl.name));
-    const res = await window.projecthub.createProjectFromTemplates({
-      name,
-      version,
-      destination,
-      templates: chosenTemplates,
-      libraries: selectedLibs,
-      description: templateValue.length ? `${name} created from ${templateValue.join(', ')}` : `${name} created without a template`
-    });
+    try {
+      const templateValue = selectedTemplates;
+      const chosenTemplates = templates.filter((tpl) => templateValue.includes(tpl.id ?? tpl.name));
+      const res = await window.projecthub.createProjectFromTemplates({
+        name,
+        version,
+        destination,
+        templates: chosenTemplates,
+        libraries: selectedLibs,
+        description: templateValue.length ? `${name} created from ${templateValue.join(', ')}` : `${name} created without a template`
+      });
 
-    if (res.ok) {
-      const updatedRecent = Array.from(new Set([name, ...(settings.recentProjects || [])])).slice(0, 5);
-      await update({ ...settings, recentProjects: updatedRecent });
-      return { ok: true };
+      if (res.ok) {
+        const updatedRecent = Array.from(new Set([name, ...(settings.recentProjects || [])])).slice(0, 5);
+        await update({ ...settings, recentProjects: updatedRecent });
+        return { ok: true };
+      }
+      return { ok: false, error: res.error };
+    } catch (error) {
+      return { ok: false, error: (error as Error).message };
     }
-    return { ok: false, error: res.error };
   };
 
   const goNext = () => {

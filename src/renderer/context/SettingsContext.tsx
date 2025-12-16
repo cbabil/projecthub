@@ -1,5 +1,5 @@
 import { Settings } from '@shared/types';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 interface SettingsContextValue {
   settings?: Settings;
@@ -36,7 +36,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     setLoading(true);
     const res = await window.projecthub.loadSettings();
     if (res.ok && res.data) {
@@ -47,9 +47,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       setError(res.error || 'Unable to load settings');
     }
     setLoading(false);
-  };
+  }, []);
 
-  const update = async (next: Settings) => {
+  const update = useCallback(async (next: Settings) => {
     const res = await window.projecthub.updateSettings(next);
     if (res.ok && res.data) {
       setSettings(res.data);
@@ -58,14 +58,19 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     } else {
       setError(res.error || 'Failed to update settings');
     }
-  };
+  }, []);
 
   useEffect(() => {
     refresh();
-  }, []);
+  }, [refresh]);
+
+  const value = useMemo(
+    () => ({ settings, refresh, update, loading, error }),
+    [settings, refresh, update, loading, error]
+  );
 
   return (
-    <SettingsContext.Provider value={{ settings, refresh, update, loading, error }}>
+    <SettingsContext.Provider value={value}>
       {children}
     </SettingsContext.Provider>
   );
