@@ -76,8 +76,8 @@ export interface TemplateMeta extends BaseMeta {
   defaultLibraries?: string[];
   /** legacy/alternative structure shape kept for compatibility */
   structure?: {
-    folders: string[];
-    files: Record<string, string>;
+    folders?: string[];
+    files?: Record<string, string>;
   };
   editable?: boolean;
   /** absolute path when template comes from a pack folder */
@@ -97,6 +97,7 @@ export interface ProjectMeta extends BaseMeta {
   librariesApplied: string[];
   category?: string;
   sourcePath?: string;
+  updatedAt?: string;
 }
 
 export interface PackMeta {

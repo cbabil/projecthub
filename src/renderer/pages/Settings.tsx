@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Button from '../components/Button.js';
 import Input from '../components/Input.js';
 import { useSettings } from '../context/SettingsContext.js';
+import { useToast } from '../context/ToastContext.js';
 import { useTranslation } from '../context/TranslationContext.js';
 
 const accents = ['primary', 'boost', 'blue', 'green', 'red'] as const;
@@ -11,6 +12,7 @@ const accents = ['primary', 'boost', 'blue', 'green', 'red'] as const;
 const SettingsPage: React.FC = () => {
   const { settings, update, loading, refresh } = useSettings();
   const { t } = useTranslation();
+  const toast = useToast();
   const [status, setStatus] = useState<string>();
   const [tab, setTab] = useState<'general' | 'packs'>('general');
   const [packs, setPacks] = useState<PackMeta[]>([]);
@@ -106,7 +108,7 @@ const SettingsPage: React.FC = () => {
           className="sm:flex-1"
           placeholder="Git URL (e.g., https://github.com/org/projecthub-packs.git)"
         />
-        <Button type="button" onClick={() => alert('Pack install from Git is not implemented yet.')}>Add pack</Button>
+        <Button type="button" onClick={() => toast('Pack install from Git is not implemented yet.', 'info')}>Add pack</Button>
       </div>
 
       <div className="space-y-2">

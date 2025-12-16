@@ -65,3 +65,43 @@ body {
 .grid-row--selected {
   background-color: color-mix(in srgb, var(--color-accent-primary) 32%, transparent);
 }
+
+/* Animation system */
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 200ms ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 200ms ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scale-in 200ms ease-out forwards;
+}

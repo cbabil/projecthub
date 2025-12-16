@@ -48,8 +48,8 @@ const TitleBar: React.FC<TitleBarProps> = ({ onOpenSettings }) => {
         if (mounted && state) {
           setIsMaximized(Boolean(state.isMaximized));
         }
-      } catch (error) {
-        console.warn('[ProjectHub] Failed to load platform settings', error);
+      } catch {
+        // Platform settings load failed - use defaults
       }
     };
 

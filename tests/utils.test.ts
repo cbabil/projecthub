@@ -35,8 +35,7 @@ describe('destination utils', () => {
 
 describe('packs fetch error paths', () => {
   it('throws when manifest asset is missing', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (globalThis as any).window = {
+    (globalThis as unknown as { window: { projecthub: { fetchManifest: () => Promise<{ ok: boolean; data: unknown }> } } }).window = {
       projecthub: {
         fetchManifest: async () =>
           ({ ok: true, data: { assets: [], tag_name: 'v0.1', published_at: '2024-01-01T00:00:00Z' } })

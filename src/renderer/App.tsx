@@ -1,20 +1,28 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 
 import Modal from './components/Modal.js';
 import SettingsModalContent from './components/settings/SettingsModalContent.js';
 import Sidebar from './components/Sidebar.js';
 import TitleBar from './components/TitleBar.js';
 import { useSettingsEvents } from './listeners/useSettingsEvents.js';
-import Libraries from './pages/Libraries.js';
-import Projects from './pages/Projects.js';
-import SettingsPage from './pages/Settings.js';
-import Templates from './pages/Templates.js';
+
+// Lazy load pages for code splitting
+const Projects = lazy(() => import('./pages/Projects.js'));
+const Templates = lazy(() => import('./pages/Templates.js'));
+const Libraries = lazy(() => import('./pages/Libraries.js'));
+const SettingsPage = lazy(() => import('./pages/Settings.js'));
+
+const PageLoader: React.FC = () => (
+  <div className="flex-1 flex items-center justify-center text-brand-text-dark/50">
+    <span className="animate-pulse">Loading...</span>
+  </div>
+);
 
 const routes = {
-  projects: { title: 'Projects', element: <Projects /> },
-  templates: { title: 'Templates', element: <Templates /> },
-  libraries: { title: 'Libraries', element: <Libraries /> },
-  settings: { title: 'Settings', element: <SettingsPage /> }
+  projects: { title: 'Projects', Component: Projects },
+  templates: { title: 'Templates', Component: Templates },
+  libraries: { title: 'Libraries', Component: Libraries },
+  settings: { title: 'Settings', Component: SettingsPage }
 };
 
 const App: React.FC = () => {
@@ -23,7 +31,7 @@ const App: React.FC = () => {
   const [isElectron, setIsElectron] = useState(false);
   const [settingsModalOpen, setSettingsModalOpen] = useState(false);
   const baseRoute = (route.startsWith('templates:') ? 'templates' : route) as keyof typeof routes;
-  const current = useMemo(() => routes[baseRoute], [baseRoute]);
+  const { Component } = useMemo(() => routes[baseRoute], [baseRoute]);
 
   useEffect(() => {
     setIsElectron(typeof window !== 'undefined' && Boolean(window.projecthub));
@@ -41,7 +49,11 @@ const App: React.FC = () => {
       {isElectron ? <TitleBar onOpenSettings={() => setSettingsModalOpen(true)} /> : null}
       <Sidebar active={route} onSelect={(key) => setRoute(key)} />
       <main className="flex-1 flex flex-col overflow-hidden">
-        <section className="flex-1 overflow-auto px-4 pb-6 pt-6 space-y-4 flex flex-col">{current.element}</section>
+        <section className="flex-1 overflow-auto px-4 pb-6 pt-6 space-y-4 flex flex-col">
+          <Suspense fallback={<PageLoader />}>
+            <Component />
+          </Suspense>
+        </section>
       </main>
       <Modal open={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} title="Settings">
         <SettingsModalContent open={settingsModalOpen} />

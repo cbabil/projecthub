@@ -22,7 +22,7 @@ module.exports = {
     'max-lines-per-function': ['error', { max: 150, skipBlankLines: true, skipComments: true }],
     'react/react-in-jsx-scope': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
-    '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-explicit-any': 'error',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error'
   }

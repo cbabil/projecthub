@@ -10,7 +10,8 @@ import { useTranslation } from '../context/TranslationContext.js';
 const Libraries: React.FC = () => {
   const { libraries, loading } = useData();
   const { t } = useTranslation();
-  const handleSelect = (lib: LibraryMeta) => console.info('Library', lib.name);
+  // TODO: Implement library selection handler
+  const handleSelect = (_lib: LibraryMeta) => void _lib;
 
   return (
     <div className="min-h-full flex flex-col space-y-4 flex-1">

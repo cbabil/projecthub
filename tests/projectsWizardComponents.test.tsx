@@ -11,10 +11,12 @@ import { LibrariesStep, ReviewStep } from '../src/renderer/components/ProjectsWi
 
 const basicsProps = {
   name: '',
+  version: '',
   destination: '',
   onNameChange: () => undefined,
+  onVersionChange: () => undefined,
   onPickLocation: () => undefined,
-  labels: { name: 'Name', destination: 'Destination', error: 'Error', choose: 'Choose' },
+  labels: { name: 'Name', version: 'Version', destination: 'Destination', error: 'Error', choose: 'Choose' },
   showError: false
 };
 
@@ -48,10 +50,11 @@ describe('ProjectsWizardContent routing', () => {
         }}
         review={{
           name: 'A',
+          version: '1.0.0',
           destination: '/tmp',
           templates: [],
           libraries: [],
-          labels: { name: 'Name', template: 'Template', installTree: 'Destination', libraries: 'Libraries', none: 'None' }
+          labels: { name: 'Name', version: 'Version', template: 'Template', installTree: 'Destination', libraries: 'Libraries', none: 'None' }
         }}
       />
     );
@@ -180,13 +183,15 @@ describe('ReviewStep', () => {
     render(
       <ReviewStep
         name="Demo"
+        version="1.0.0"
         destination="/projects/demo"
         templates={[{ name: 'Config', category: 'config' }]}
         libraries={['lib1', 'lib2']}
-        labels={{ name: 'Name', installTree: 'Destination', template: 'Template', libraries: 'Libraries', none: 'None' }}
+        labels={{ name: 'Name', version: 'Version', installTree: 'Destination', template: 'Template', libraries: 'Libraries', none: 'None' }}
       />
     );
-    expect(screen.getByText('config: Config')).toBeInTheDocument();
+    expect(screen.getByText(/1 selected/)).toBeInTheDocument();
+    expect(screen.getByText(/config: 1/)).toBeInTheDocument();
     expect(screen.queryByText(/No workspace template/)).not.toBeNull();
     expect(screen.getByText('lib1, lib2')).toBeInTheDocument();
   });

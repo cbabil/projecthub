@@ -11,7 +11,20 @@ on:
         required: false
 
 jobs:
+  get-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get version from package.json
+        id: version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
   build:
+    needs: get-version
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
@@ -46,37 +59,40 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: projecthub-${{ matrix.os }}
+          name: projecthub-${{ needs.get-version.outputs.version }}-${{ matrix.os }}
           path: release/**
 
   release:
-    needs: build
+    needs: [get-version, build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
+      - name: Checkout (for release notes template)
+        uses: actions/checkout@v4
+
       - name: Download macOS artifacts
         uses: actions/download-artifact@v4
         with:
-          name: projecthub-macos-latest
+          name: projecthub-${{ needs.get-version.outputs.version }}-macos-latest
           path: artifacts/macos
 
       - name: Download Windows artifacts
         uses: actions/download-artifact@v4
         with:
-          name: projecthub-windows-latest
+          name: projecthub-${{ needs.get-version.outputs.version }}-windows-latest
           path: artifacts/windows
 
       - name: Download Linux artifacts
         uses: actions/download-artifact@v4
         with:
-          name: projecthub-ubuntu-latest
+          name: projecthub-${{ needs.get-version.outputs.version }}-ubuntu-latest
           path: artifacts/linux
 
       - name: Prepare upload zips (one per OS)
         shell: bash
         env:
-          TAG: ${{ github.event.inputs.tag }}
+          VERSION: ${{ needs.get-version.outputs.version }}
         run: |
           set -euo pipefail
           rm -rf upload && mkdir -p upload
@@ -91,7 +107,7 @@ jobs:
               echo "Skipping $label: no installer matching $pattern" >&2
               return
             fi
-            local out="upload/ProjectHub-${label}-${TAG}.zip"
+            local out="upload/ProjectHub-${label}-v${VERSION}.zip"
             zip -j "$out" "${installers[@]}"
           }
           pack artifacts/macos macos "*.dmg"
@@ -101,18 +117,21 @@ jobs:
       - name: Compose release notes
         shell: bash
         env:
+          VERSION: ${{ needs.get-version.outputs.version }}
           TAG: ${{ github.event.inputs.tag }}
         run: |
           notes=$(< .github/release-notes-template.md)
           notes=${notes//{{TAG}}/$TAG}
+          notes=${notes//{{VERSION}}/$VERSION}
           printf "%s\n" "$notes" > release-notes.md
 
       - name: Create GitHub Release
         shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.get-version.outputs.version }}
           TAG: ${{ github.event.inputs.tag }}
-          RELEASE_NAME: ${{ github.event.inputs.name || github.event.inputs.tag }}
+          RELEASE_NAME: ${{ github.event.inputs.name || format('v{0}', needs.get-version.outputs.version) }}
         run: |
           set -euo pipefail
           mapfile -t files < <(find upload -maxdepth 1 -type f -name '*.zip' | sort)

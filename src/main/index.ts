@@ -2,6 +2,7 @@ import { electronApp } from '@electron-toolkit/utils';
 import { PACKS_DIR, PROJECTS_DIR } from '@shared/constants.js';
 import { clearPacksCache } from '@shared/dataStore.js';
 import { ensureRoots, listTemplates, loadSettings } from '@shared/dataStore.js';
+import { logger } from '@shared/logger.js';
 import { app, BrowserWindow } from 'electron';
 import fs from 'fs';
 
@@ -23,8 +24,7 @@ const handleAppReady = async () => {
     if (settings.trace === 'debug') {
       process.env.DEBUG = '1';
     }
-    const ts = new Date().toISOString();
-    console.info(`[${ts}] [ProjectHub] trace level: ${settings.trace}`);
+    logger.info('ProjectHub', `trace level: ${settings.trace}`);
   }
   await listTemplates('app:init');
   buildMenu();
@@ -61,7 +61,7 @@ const watchDirectories = () => {
         });
       });
     } catch (error) {
-      console.warn('Failed to watch', target, error);
+      logger.warn('ProjectHub', 'Failed to watch', target, error);
     }
   });
 };

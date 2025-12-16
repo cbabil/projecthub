@@ -33,7 +33,6 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>();
   const [templateFilter, setTemplateFilter] = useState<string>();
-  const initialLoad = React.useRef(false);
 
   const refreshAll = useCallback(async (source = 'renderer:refreshAll') => {
     setLoading(true);

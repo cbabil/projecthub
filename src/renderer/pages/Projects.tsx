@@ -5,15 +5,18 @@ import React, { useState } from 'react';
 import Button from '../components/Button.js';
 import Grid from '../components/Grid.js';
 import Modal from '../components/Modal.js';
-import type { GridColumn } from '../hooks/useDataGrid.js';
 import ProjectsWizard from '../components/ProjectsWizard.js';
 import { useData } from '../context/DataContext.js';
+import { useToast } from '../context/ToastContext.js';
 import { useTranslation } from '../context/TranslationContext.js';
-import { truncate, formatDate } from '../utils/text.js';
+import type { GridColumn } from '../hooks/useDataGrid.js';
+import { safeIpcVoid } from '../utils/ipc.js';
+import { formatDate } from '../utils/text.js';
 
 const Projects: React.FC = () => {
   const { projects, loading, refreshAll } = useData();
   const { t } = useTranslation();
+  const toast = useToast();
   const [wizardOpen, setWizardOpen] = useState(false);
 
   React.useEffect(() => {
@@ -24,12 +27,11 @@ const Projects: React.FC = () => {
     project.sourcePath ?? `${project.name.replace(/\s+/g, '_').toLowerCase()}/metadata.yaml`;
 
   const handleDelete = async (project: ProjectMeta) => {
-    const res = await window.projecthub.deleteProject({ relativePath: resolveProjectFile(project), folderPath: project.path });
-    if (!res.ok) {
-      window.alert(res.error || 'Failed to delete project');
-    } else {
-      await refreshAll();
-    }
+    const success = await safeIpcVoid(
+      () => window.projecthub.deleteProject({ relativePath: resolveProjectFile(project), folderPath: project.path }),
+      { toast, errorPrefix: 'Failed to delete project', showSuccess: true, successMessage: 'Project deleted successfully' }
+    );
+    if (success) await refreshAll();
   };
 
   const columns: GridColumn<ProjectMeta>[] = [

@@ -1,5 +1,20 @@
 import { PackMeta } from '@shared/types';
 
+/** GitHub Release API asset shape */
+interface GitHubAsset {
+  name: string;
+  browser_download_url: string;
+}
+
+/** GitHub Release API response shape */
+interface GitHubRelease {
+  tag_name?: string;
+  published_at?: string;
+  created_at?: string;
+  assets?: GitHubAsset[];
+  license?: { spdx_id?: string };
+}
+
 const normalizeGithubReleaseUrl = (url: string): string => {
   const trimmed = url.trim();
   const githubMatch = trimmed.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/releases(?:\/(tag\/[^/]+|latest))?\/?$/i);
@@ -60,10 +75,10 @@ export const fetchPackList = async (releaseUrl: string): Promise<PackMeta[]> => 
   const releaseApiUrl = normalizeGithubReleaseUrl(target);
   const relRes = await window.projecthub.fetchManifest?.(releaseApiUrl);
   if (!relRes?.ok || !relRes.data) throw new Error(relRes?.error || 'Failed to load releases');
-  const rel = relRes.data as any;
+  const rel = relRes.data as GitHubRelease;
 
   const releasedOn = rel.published_at || rel.created_at || new Date().toISOString();
-  const manifestAsset = (rel.assets || []).find((a: any) => a.name === 'packs-manifest.json');
+  const manifestAsset = (rel.assets || []).find((a) => a.name === 'packs-manifest.json');
   if (!manifestAsset) throw new Error('packs-manifest.json not found in latest release');
 
   const manifestRes = await window.projecthub.fetchManifest?.(manifestAsset.browser_download_url);
@@ -82,7 +97,7 @@ export const fetchPackList = async (releaseUrl: string): Promise<PackMeta[]> => 
   };
 
   const packs = (manifest.packs || []).map((p) => {
-    const zipAsset = (rel.assets || []).find((a: any) => a.name === p.zip);
+    const zipAsset = (rel.assets || []).find((a) => a.name === p.zip);
     if (!zipAsset) return null; // skip entries without a matching asset
     const path = zipAsset.browser_download_url;
     const isZip = String(path).toLowerCase().endsWith('.zip');

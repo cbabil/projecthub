@@ -34,6 +34,14 @@ vi.mock('../src/renderer/context/DataContext.js', () => ({
   useData: () => dataState
 }));
 
+// Mock ToastContext
+const mockAddToast = vi.fn();
+vi.mock('../src/renderer/context/ToastContext.js', () => ({
+  useToast: () => mockAddToast,
+  useToasts: () => ({ toasts: [], removeToast: vi.fn() }),
+  ToastProvider: ({ children }: { children: React.ReactNode }) => children
+}));
+
 if (!('projecthub' in window)) {
   (window as any).projecthub = {};
 }
@@ -42,9 +50,7 @@ if (!('projecthub' in window)) {
 (window.projecthub as any).readTemplate = vi.fn().mockResolvedValue({ ok: true, data: 'title: ViewMe' });
 (window.projecthub as any).updateTemplate = vi.fn().mockResolvedValue({ ok: true });
 (window.projecthub as any).ipc = { on: vi.fn(), removeAllListeners: vi.fn() };
-if (!window.alert) window.alert = (() => undefined) as any;
 if (!window.confirm) window.confirm = (() => true) as any;
-const alertSpy = vi.spyOn(window, 'alert');
 const confirmSpy = vi.spyOn(window, 'confirm');
 
 beforeEach(() => {
@@ -53,19 +59,18 @@ beforeEach(() => {
   dataState.loading = false;
   (window.projecthub.deleteTemplate as any).mockReset();
   (window.projecthub.deleteProject as any).mockReset();
-  alertSpy.mockClear();
+  mockAddToast.mockClear();
   confirmSpy.mockClear();
-  alertSpy.mockImplementation(() => undefined);
   confirmSpy.mockImplementation(() => true);
 });
 
 describe('Templates page edge cases', () => {
-  it('alerts when deleting template without sourcePath', async () => {
+  it('shows toast when deleting template without sourcePath', async () => {
     const user = userEvent.setup();
     dataState.filteredTemplates = [{ name: 'NoPath', description: '', category: 'templates', version: '1', lastEdited: '', editable: true }];
     render(<Templates />);
     await user.click(screen.getByLabelText('Delete template'));
-    expect(window.alert).toHaveBeenCalledWith('Template path unknown; cannot delete.');
+    expect(mockAddToast).toHaveBeenCalledWith('Template path unknown; cannot delete.', 'error');
   });
 
   it('opens modal on view and closes it', async () => {
@@ -102,7 +107,7 @@ describe('Templates page edge cases', () => {
     ];
     render(<Templates />);
     await user.click(screen.getByLabelText('Delete template'));
-    expect(window.alert).toHaveBeenCalledWith('boom');
+    expect(mockAddToast).toHaveBeenCalledWith('Failed to delete template: boom', 'error');
   });
 });
 
@@ -123,12 +128,12 @@ describe('Projects page edge cases', () => {
     await userProjects.click(deleteBtn);
     await waitFor(() =>
       expect(window.projecthub.deleteProject).toHaveBeenCalledWith(
-        expect.objectContaining({ relativePath: 'my_project.json', folderPath: '/tmp' })
+        expect.objectContaining({ relativePath: 'my_project/metadata.yaml', folderPath: '/tmp' })
       )
     );
   });
 
-  it('alerts when deleteProject fails', async () => {
+  it('shows toast when deleteProject fails', async () => {
     const user = userEvent.setup();
     (window.projecthub.deleteProject as any).mockResolvedValue({ ok: false, error: 'nope' });
     dataState.projects = [
@@ -142,7 +147,7 @@ describe('Projects page edge cases', () => {
     if (!deleteBtn) throw new Error('delete button not found');
     const userProjects = userEvent.setup();
     await userProjects.click(deleteBtn);
-    await waitFor(() => expect(window.alert).toHaveBeenCalledWith('nope'));
+    await waitFor(() => expect(mockAddToast).toHaveBeenCalledWith('Failed to delete project: nope', 'error'));
   });
 
   it('opens wizard modal via action button', async () => {
