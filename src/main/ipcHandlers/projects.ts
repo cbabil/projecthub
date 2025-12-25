@@ -1,4 +1,4 @@
-import { createProjectFile, deleteProjectFile, listLibraries, listProjects } from '@shared/dataStore.js';
+import { createProjectFile, deleteProjectFile, listProjects } from '@shared/dataStore.js';
 import { normalizeTemplate } from '@shared/templates.js';
 import type { OperationResult, ProjectMeta, TemplateMeta } from '@shared/types.js';
 import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
@@ -13,7 +13,6 @@ const ensureChannel = <T>(channel: string, handler: (...args: unknown[]) => Prom
 };
 
 export const registerProjectsHandlers = () => {
-  ensureChannel('filesystem:listLibraries', () => listLibraries());
   ensureChannel('filesystem:listProjects', () => listProjects());
 
   ensureChannel('filesystem:deleteProject', async (payload: { relativePath: string; folderPath?: string }) => {

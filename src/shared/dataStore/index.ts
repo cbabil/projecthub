@@ -11,7 +11,10 @@ export { clearPacksCache, listTemplateFolders, listTemplates } from './templates
 export { deleteTemplateFile, readTemplateYaml, writeTemplateYaml } from './templateFiles.js';
 
 // Libraries
-export { listLibraries } from './libraries.js';
+export { clearLibrariesCache, listLibraries } from './libraries.js';
+
+// Library file operations
+export { deleteLibraryFile, readLibraryYaml, writeLibraryYaml } from './libraryFiles.js';
 
 // Projects
 export { createProjectFile, deleteProjectFile, listProjects } from './projects.js';

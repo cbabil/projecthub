@@ -100,8 +100,12 @@ export interface TemplateMeta extends BaseMeta {
 
 export interface LibraryMeta extends BaseMeta {
   type: 'library';
+  id?: string;
   files?: Record<string, string>;
   category?: string;
+  sourcePath?: string;
+  packPath?: string;
+  editable?: boolean;
 }
 
 export interface ProjectMeta extends BaseMeta {
