@@ -13,14 +13,14 @@ interface ActionHandlers {
 
 /** Build columns for Libraries page grid */
 export const buildLibrariesColumns = (handlers: ActionHandlers): GridColumn<LibraryMeta>[] => [
-  { id: 'name', label: 'Name', accessor: (row) => row.name, sortable: true, sortValue: (row) => row.name, width: '160px' },
+  { id: 'name', label: 'Name', accessor: (row) => row.name, sortable: true, sortValue: (row) => row.name, width: '140px' },
   {
     id: 'description',
     label: 'Description',
     accessor: (row) => truncate(row.description ?? ''),
     sortable: true,
     sortValue: (row) => row.description ?? '',
-    width: '220px'
+    width: '1fr'
   },
   {
     id: 'category',
@@ -28,23 +28,23 @@ export const buildLibrariesColumns = (handlers: ActionHandlers): GridColumn<Libr
     accessor: (row) => row.category ?? 'library',
     sortable: true,
     sortValue: (row) => row.category ?? '',
-    width: '120px'
+    width: '110px'
   },
-  { id: 'version', label: 'Version', accessor: (row) => row.version ?? '-', sortable: true, sortValue: (row) => row.version ?? '', width: '90px' },
+  { id: 'version', label: 'Version', accessor: (row) => row.version ?? '-', sortable: true, sortValue: (row) => row.version ?? '', width: '80px' },
   {
     id: 'lastEdited',
     label: 'Last Edited',
     accessor: (row) => formatDate(row.lastEdited),
     sortable: true,
     sortValue: (row) => row.lastEdited ?? '',
-    width: '140px'
+    width: '130px'
   },
   {
     id: 'actions',
     label: 'Actions',
     headerAlign: 'center',
     accessor: (row) => (
-      <div className="flex justify-center gap-2 pr-2" onClick={(e) => e.stopPropagation()}>
+      <div className="flex justify-center gap-2" onClick={(e) => e.stopPropagation()}>
         <button className="p-1 text-brand-text-dark hover:text-brand-accent-boost" onClick={() => handlers.onView(row)} aria-label="View library">
           <Eye size={16} />
         </button>
@@ -61,6 +61,6 @@ export const buildLibrariesColumns = (handlers: ActionHandlers): GridColumn<Libr
         </button>
       </div>
     ),
-    width: '118px'
+    width: '100px'
   }
 ];
