@@ -88,10 +88,10 @@ const DataGrid = <T,>({
           {headerActions}
         </div>
       )}
-      <div className={fillContainer ? 'flex-1 min-h-0 overflow-x-hidden' : 'overflow-x-hidden'}>
+      <div className={fillContainer ? 'flex-1 min-h-0 overflow-hidden' : 'overflow-hidden'}>
         <div
           className="flex flex-col w-full overflow-hidden"
-          style={fillContainer ? { height: '100%', minWidth: '100%' } : { minWidth: '100%' }}
+          style={fillContainer ? { height: '100%', width: '100%' } : { width: '100%' }}
         >
           {enableSearch && searchInsideCard && (
             <div className="px-4 pt-4 flex items-center gap-3">

@@ -13,7 +13,7 @@ interface Props<T> {
 
 const DataGridHeader = <T,>({ columns, selectionMode, gridTemplateColumns, onToggleSort, renderSortIndicator }: Props<T>) => (
   <div
-    className="grid gap-3 px-4 py-2 text-xs uppercase tracking-wide text-brand-text-dark/70 border-b border-white/5"
+    className="grid gap-3 px-4 py-2 text-xs uppercase tracking-wide text-brand-text-dark/70 border-b border-white/5 w-full"
     style={{ gridTemplateColumns }}
   >
     {selectionMode === 'none' ? null : <span></span>}
