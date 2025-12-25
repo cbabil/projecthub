@@ -2,23 +2,22 @@ import { Loader2, RefreshCw, Store } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { PACK_CATEGORIES } from '../../shared/marketplace.constants.js';
-import CategoryFilter from '../components/CategoryFilter.js';
+import MarketplaceFilters, { SortBy, StatusFilter } from '../components/MarketplaceFilters.js';
 import PackCard from '../components/PackCard.js';
 import Search from '../components/Search.js';
-import { useMarketplaces } from '../context/MarketplaceContext.js';
+import { usePacks } from '../context/PacksContext.js';
 import { useToast } from '../context/ToastContext.js';
-import { usePacksList } from '../hooks/usePacksList.js';
 
 const Marketplace: React.FC = () => {
-  const { marketplaces } = useMarketplaces();
-  const { packs, refreshing, installingId, removingId, errors, refresh, installPack, removePack } = usePacksList(marketplaces);
+  const { packs, refreshing, installingId, removingId, errors, refresh, installPack, removePack } = usePacks();
   const addToast = useToast();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [sortBy, setSortBy] = useState<SortBy>('name');
   const shownErrorsRef = useRef<Set<string>>(new Set());
 
-  // Show toast when marketplace errors occur
   useEffect(() => {
     const errorKeys = Object.keys(errors);
     if (errorKeys.length > 0) {
@@ -30,7 +29,6 @@ const Marketplace: React.FC = () => {
     }
   }, [errors, addToast]);
 
-  // Get categories that have at least one pack
   const visibleCategories = useMemo(() => {
     const packCategories = new Set(packs.map((p) => p.category || 'Other'));
     return PACK_CATEGORIES.filter((cat) => packCategories.has(cat));
@@ -39,12 +37,20 @@ const Marketplace: React.FC = () => {
   const filteredPacks = useMemo(() => {
     let result = packs;
 
-    // Category filter
+    if (statusFilter === 'installed') {
+      result = result.filter((p) => p.status === 'installed');
+    } else if (statusFilter === 'not-installed') {
+      result = result.filter((p) => p.status !== 'installed');
+    } else if (statusFilter === 'updates') {
+      result = result.filter(
+        (p) => p.status === 'installed' && p.installedVersion && p.version && p.installedVersion !== p.version
+      );
+    }
+
     if (selectedCategory !== 'All') {
       result = result.filter((p) => (p.category || 'Other') === selectedCategory);
     }
 
-    // Search filter
     if (searchQuery.trim()) {
       const lower = searchQuery.toLowerCase();
       result = result.filter(
@@ -55,8 +61,17 @@ const Marketplace: React.FC = () => {
       );
     }
 
-    return result;
-  }, [packs, selectedCategory, searchQuery]);
+    return [...result].sort((a, b) => {
+      if (sortBy === 'name') return (a.name || '').localeCompare(b.name || '');
+      if (sortBy === 'category') return (a.category || 'Other').localeCompare(b.category || 'Other');
+      if (sortBy === 'date') {
+        const dateA = a.releasedOn ? new Date(a.releasedOn).getTime() : 0;
+        const dateB = b.releasedOn ? new Date(b.releasedOn).getTime() : 0;
+        return dateB - dateA;
+      }
+      return 0;
+    });
+  }, [packs, selectedCategory, searchQuery, statusFilter, sortBy]);
 
   const showLoading = refreshing && packs.length === 0;
 
@@ -70,12 +85,11 @@ const Marketplace: React.FC = () => {
             <p className="text-sm text-brand-text-dark/60">Browse and install template packs</p>
           </div>
         </div>
-
         <button
           type="button"
           onClick={refresh}
           disabled={refreshing}
-          className="px-3 py-2 text-sm text-brand-text-dark/70 hover:text-white inline-flex items-center gap-2 disabled:opacity-50 transition-colors"
+          className="px-3 py-2 text-sm text-brand-text-dark/70 hover:text-white inline-flex items-center gap-2 disabled:opacity-50"
         >
           {refreshing ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
           Refresh
@@ -84,13 +98,15 @@ const Marketplace: React.FC = () => {
 
       <Search value={searchQuery} onChange={setSearchQuery} placeholder="Search packs..." />
 
-      {visibleCategories.length > 0 && (
-        <CategoryFilter
-          categories={visibleCategories}
-          selected={selectedCategory}
-          onChange={setSelectedCategory}
-        />
-      )}
+      <MarketplaceFilters
+        categories={visibleCategories}
+        selectedCategory={selectedCategory}
+        onCategoryChange={setSelectedCategory}
+        statusFilter={statusFilter}
+        onStatusChange={setStatusFilter}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+      />
 
       {showLoading ? (
         <div className="flex-1 flex items-center justify-center">
@@ -125,7 +141,6 @@ const Marketplace: React.FC = () => {
           </div>
         </div>
       )}
-
     </div>
   );
 };

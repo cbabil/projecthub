@@ -2,6 +2,7 @@ import { FileJson, Folder, Library, Store } from 'lucide-react';
 import React from 'react';
 
 import { useData } from '../context/DataContext.js';
+import { usePacks } from '../context/PacksContext.js';
 import { ProjectHubNav } from '../types/navigation.js';
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 const Sidebar: React.FC<Props> = ({ active, onSelect }) => {
   const [directories, setDirectories] = React.useState<string[]>([]);
   const { setTemplateFilter } = useData();
+  const { updateCount } = usePacks();
 
   React.useEffect(() => {
     const loadDirs = () =>
@@ -109,6 +111,11 @@ const Sidebar: React.FC<Props> = ({ active, onSelect }) => {
         >
           <Store size={18} />
           <span className="text-sm">Marketplace</span>
+          {updateCount > 0 && (
+            <span className="ml-auto px-1.5 py-0.5 text-[10px] font-medium bg-amber-500 text-white rounded-full">
+              {updateCount}
+            </span>
+          )}
         </button>
       </div>
     </aside>
