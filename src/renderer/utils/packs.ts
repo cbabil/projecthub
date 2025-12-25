@@ -1,4 +1,55 @@
-import { PackMeta } from '@shared/types';
+import type { Marketplace, PackMeta } from '@shared/types';
+
+export type PackRow = PackMeta & { type: string; lastEdited: string; installedVersion?: string };
+
+const normalize = (name?: string) => (name || '').replace(/\.zip$/i, '').toLowerCase();
+const isJsonFile = (p: PackMeta) => {
+  const name = String(p.name || '').toLowerCase();
+  const path = String(p.path || '').toLowerCase();
+  return name.endsWith('.json') || path.endsWith('.json');
+};
+
+export interface FetchResult {
+  packs: PackMeta[];
+  errors: Record<string, string>;
+}
+
+export async function fetchAllMarketplaces(marketplaces: Marketplace[]): Promise<FetchResult> {
+  const results = await Promise.allSettled(
+    marketplaces.map(async (m) => ({ marketplace: m, list: await fetchPackList(m.url) }))
+  );
+  const errors: Record<string, string> = {};
+  const packs: PackMeta[] = [];
+
+  results.forEach((result, i) => {
+    if (result.status === 'fulfilled') {
+      result.value.list.filter((p) => !isJsonFile(p)).forEach((pack) => {
+        packs.push({ ...pack, marketplaceId: result.value.marketplace.id, marketplaceName: result.value.marketplace.name });
+      });
+    } else {
+      const msg = result.reason?.message || 'Failed to fetch';
+      errors[marketplaces[i].id] = msg.includes('403') || msg.includes('429') ? 'GitHub rate limit.' : msg;
+    }
+  });
+  return { packs, errors };
+}
+
+export function mergeWithInstalled(remotePacks: PackMeta[], installed: PackMeta[]): PackRow[] {
+  return remotePacks.map((p) => {
+    const match = installed.find((i) => normalize(i.name) === normalize(p.name));
+    return {
+      ...p,
+      type: 'project',
+      name: p.name || '-',
+      description: p.description || '-',
+      version: p.version || '-',
+      localPath: match?.path,
+      status: match ? 'installed' : 'missing',
+      installedVersion: match?.version,
+      lastEdited: p.releasedOn || ''
+    } as PackRow;
+  });
+}
 
 /** GitHub Release API asset shape */
 interface GitHubAsset {

@@ -134,7 +134,7 @@ const TitleBar: React.FC<TitleBarProps> = ({ onOpenSettings }) => {
 
   return (
     <header
-      className={`${platformClass} fixed inset-x-0 top-0 z-50 border-b border-black/10 bg-brand-surface-dark/90 text-brand-text-dark shadow-sm backdrop-blur`}
+      className={`${platformClass} fixed inset-x-0 top-0 z-50 border-b border-black/10 bg-brand-accent-primary text-white shadow-sm`}
       onDoubleClick={handleDoubleClick}
     >
       <div className="custom-title-bar__section custom-title-bar__left" />

@@ -23,14 +23,13 @@ const DataGridHeader = <T,>({ columns, selectionMode, gridTemplateColumns, onTog
         <button
           key={col.id}
           type="button"
-          className={`flex items-center gap-2 whitespace-nowrap min-w-0 truncate ${
+          className={`flex items-center gap-2 whitespace-nowrap overflow-hidden ${
             col.headerAlign === 'right'
               ? 'justify-end text-right pr-2'
               : col.headerAlign === 'center'
                 ? 'justify-center text-center'
                 : 'text-left'
           } ${direction ? 'text-white' : ''}`}
-          style={col.width ? { width: col.width } : undefined}
           onClick={() => col.sortable && onToggleSort(col.id)}
           disabled={!col.sortable}
         >

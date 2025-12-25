@@ -21,6 +21,17 @@
   --color-accent-red: #ef4444;
 }
 
+html {
+  font-size: 14px;
+}
+
+/* Reduce motion */
+:root.reduce-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
 .light {
   --color-bg-dark: #f7f7fa;
   --color-surface-dark: #ffffff;

@@ -1,6 +1,11 @@
 import os from 'os';
 import path from 'path';
 
+import { OFFICIAL_MARKETPLACE } from './marketplace.constants.js';
+
+// Re-export for convenience (main process only)
+export { OFFICIAL_MARKETPLACE };
+
 const home = os.homedir();
 export const ROOT_DIR = path.join(home, '.projecthub');
 export const SETTINGS_PATH = path.join(ROOT_DIR, 'settings.local.json');
@@ -8,6 +13,8 @@ export const TEMPLATES_DIR = path.join(ROOT_DIR, 'templates'); // legacy only
 export const LIBRARIES_DIR = path.join(ROOT_DIR, 'libraries'); // legacy only
 export const PROJECTS_DIR = path.join(ROOT_DIR, 'projects');
 export const PACKS_DIR = path.join(ROOT_DIR, 'packs');
+export const MARKETPLACE_DIR = path.join(ROOT_DIR, 'marketplace');
+export const MARKETPLACE_METADATA_PATH = path.join(MARKETPLACE_DIR, 'metadata.yml');
 
 export const DEFAULT_TITLEBAR = {
   window: {
@@ -28,8 +35,6 @@ export const DEFAULT_SETTINGS = {
   installPath: ROOT_DIR,
   projectsPath: PROJECTS_DIR,
   packsPath: PACKS_DIR,
-  // Default to the latest GitHub release so new pack ZIPs are discovered automatically
-  packsRepoUrl: 'https://github.com/cbabil/projecthub-packs/releases/latest',
   trace: 'info',
   theme: 'dark',
   accentColor: 'primary',

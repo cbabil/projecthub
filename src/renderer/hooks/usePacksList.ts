@@ -1,90 +1,62 @@
-import type { BaseMeta, PackMeta } from '@shared/types';
-import { useCallback, useEffect, useState } from 'react';
+import type { BaseMeta, Marketplace } from '@shared/types';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useToast } from '../context/ToastContext.js';
-import { fetchPackList } from '../utils/packs.js';
+import { fetchAllMarketplaces, mergeWithInstalled, type PackRow as UtilPackRow } from '../utils/packs.js';
 import { isSameVersion } from '../utils/text.js';
 
-export type PackRow = PackMeta &
-  BaseMeta & {
-    installedVersion?: string;
-  };
+export type PackRow = UtilPackRow & BaseMeta;
 
 interface UsePacksListResult {
   packs: PackRow[];
   refreshing: boolean;
   installingId?: string;
   removingId?: string;
-  error?: string;
+  errors: Record<string, string>;
   refresh: () => void;
   installPack: (pack: PackRow) => Promise<void>;
   removePack: (pack: PackRow) => Promise<void>;
 }
 
-export function usePacksList(repoUrl?: string): UsePacksListResult {
+export function usePacksList(marketplaces: Marketplace[] = []): UsePacksListResult {
   const toast = useToast();
   const [packs, setPacks] = useState<PackRow[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [installingId, setInstallingId] = useState<string>();
   const [removingId, setRemovingId] = useState<string>();
-  const [error, setError] = useState<string>();
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [hasFetched, setHasFetched] = useState(false);
+
+  const enabled = useMemo(() => marketplaces.filter((m) => m.enabled), [marketplaces]);
+  const key = useMemo(() => enabled.map((m) => m.url).join('|'), [enabled]);
 
   const loadPacks = useCallback(
     async (force = false) => {
-      if (!repoUrl || refreshing) return;
-      if (!force && hasFetched) return;
+      if (enabled.length === 0 || refreshing || (!force && hasFetched)) return;
       setRefreshing(true);
       try {
         const installedRes = await window.projecthub.listPacks?.();
         const installed = installedRes?.ok && installedRes.data ? installedRes.data : [];
-        const normalize = (name?: string) => (name || '').replace(/\.zip$/i, '').toLowerCase();
-        const list = await fetchPackList(repoUrl);
-        const filtered = list.filter((p) => {
-          const name = String(p.name || '').toLowerCase();
-          const path = String(p.path || '').toLowerCase();
-          const isJson = name.endsWith('.json') || path.endsWith('.json');
-          return !isJson;
-        });
-        const merged: PackRow[] = filtered.map((p) => {
-          const installedMatch = installed.find((i) => normalize(i.name) === normalize(p.name));
-          const isInstalled = Boolean(installedMatch);
-          const installedVersion = installedMatch?.version;
-          return {
-            ...p,
-            name: p.name || '-',
-            description: p.description || '-',
-            version: p.version || '-',
-            localPath: installedMatch?.path,
-            status: isInstalled ? 'installed' : 'missing',
-            installedVersion,
-            lastEdited: p.releasedOn || ''
-          } as PackRow;
-        });
-        setPacks(merged);
-        setError(undefined);
+        const { packs: remotePacks, errors: fetchErrors } = await fetchAllMarketplaces(enabled);
+        setPacks(mergeWithInstalled(remotePacks, installed) as PackRow[]);
+        setErrors(fetchErrors);
         setHasFetched(true);
       } catch (err) {
-        const msg = (err as Error).message || 'Failed to load packs';
-        if (msg.includes('403') || msg.includes('429')) {
-          setError('Cannot fetch packs (GitHub rate limit). Try again later or point packsRepoUrl to a local manifest.');
-        } else {
-          setError(msg);
-        }
+        setErrors({ global: (err as Error).message || 'Failed to load packs' });
         setPacks([]);
         setHasFetched(true);
       } finally {
         setRefreshing(false);
       }
     },
-    [repoUrl, refreshing, hasFetched]
+    [enabled, refreshing, hasFetched]
   );
 
   useEffect(() => {
     setHasFetched(false);
-    setError(undefined);
+    setErrors({});
     setPacks([]);
-  }, [repoUrl]);
+  }, [key]);
 
   useEffect(() => {
     loadPacks();
@@ -93,29 +65,21 @@ export function usePacksList(repoUrl?: string): UsePacksListResult {
   const refresh = useCallback(() => {
     if (refreshing) return;
     setHasFetched(false);
-    setError(undefined);
+    setErrors({});
     loadPacks(true);
   }, [refreshing, loadPacks]);
 
   const installPack = useCallback(
     async (pack: PackRow) => {
-      if (!pack.path) return;
-      if (isSameVersion(pack.version, pack.installedVersion)) {
-        toast('This version is already installed.', 'info');
+      if (!pack.path || isSameVersion(pack.version, pack.installedVersion)) {
+        if (isSameVersion(pack.version, pack.installedVersion)) toast('This version is already installed.', 'info');
         return;
       }
-      const confirmed = window.confirm(
-        `Install pack "${pack.name}" from the repository? This will download and add all of its templates and libraries.`
-      );
-      if (!confirmed) return;
+      if (!window.confirm(`Install pack "${pack.name}"? This downloads and adds its templates and libraries.`)) return;
       setInstallingId(pack.name);
       const res = await window.projecthub.installPack?.({ url: pack.path, checksum: pack.checksum });
-      if (!res?.ok) {
-        toast(res?.error || 'Failed to install pack', 'error');
-      } else {
-        toast(`Pack "${pack.name}" installed successfully`, 'success');
-        setHasFetched(false);
-      }
+      toast(res?.ok ? `Pack "${pack.name}" installed successfully` : res?.error || 'Failed to install pack', res?.ok ? 'success' : 'error');
+      if (res?.ok) setHasFetched(false);
       setInstallingId(undefined);
     },
     [toast]
@@ -124,15 +88,12 @@ export function usePacksList(repoUrl?: string): UsePacksListResult {
   const removePack = useCallback(
     async (pack: PackRow) => {
       if (pack.status !== 'installed') return;
-      const confirmed = window.confirm(
-        `Uninstall pack "${pack.name}"? This removes the entire pack and all of its templates from disk.`
-      );
-      if (!confirmed) return;
+      if (!window.confirm(`Uninstall pack "${pack.name}"? This removes the pack and its templates from disk.`)) return;
       setRemovingId(pack.name);
       try {
-        if (!window.projecthub.removePack) throw new Error('Remove pack API unavailable (restart may be required)');
+        if (!window.projecthub.removePack) throw new Error('Remove pack API unavailable');
         const res = await window.projecthub.removePack({ name: pack.name, path: pack.localPath });
-        if (!res.ok) throw new Error(res.error || 'Unknown error from main process');
+        if (!res.ok) throw new Error(res.error || 'Unknown error');
         toast(`Pack "${pack.name}" removed successfully`, 'success');
         setHasFetched(false);
       } catch (err) {
@@ -144,14 +105,5 @@ export function usePacksList(repoUrl?: string): UsePacksListResult {
     [toast]
   );
 
-  return {
-    packs,
-    refreshing,
-    installingId,
-    removingId,
-    error,
-    refresh,
-    installPack,
-    removePack
-  };
+  return { packs, refreshing, installingId, removingId, errors, refresh, installPack, removePack };
 }

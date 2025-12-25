@@ -19,5 +19,8 @@ export { createProjectFile, deleteProjectFile, listProjects } from './projects.j
 // Packs
 export { fetchJsonFromUrl, installPackFromUrl, listPacks, removePack } from './packs.js';
 
+// Marketplace
+export { ensureMarketplaceDir, loadMarketplaces, migrateFromSettings, saveMarketplaces } from './marketplace.js';
+
 // Utils (export types for consumers who need them)
 export type { PackContentEntry, PackFileEntry, PackMetadataYaml } from './utils.js';
