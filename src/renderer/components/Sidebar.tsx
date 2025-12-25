@@ -94,7 +94,7 @@ const Sidebar: React.FC<Props> = ({ active, onSelect }) => {
         }}
       >
         <Library size={18} />
-        <span className="text-sm">Libraries <span className="text-[11px] text-brand-text-dark/70">(Coming soon)</span></span>
+        <span className="text-sm">Libraries</span>
       </button>
 
       <div className="mt-auto pt-4 border-t border-brand-divider/20">
