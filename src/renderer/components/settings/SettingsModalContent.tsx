@@ -1,11 +1,34 @@
 import type { Settings } from '@shared/types';
-import React, { useEffect, useState } from 'react';
+import { FolderOpen } from 'lucide-react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+import pkg from '../../../../package.json';
 import { useSettings } from '../../context/SettingsContext.js';
-import { useTranslation } from '../../context/TranslationContext.js';
 import Button from '../Button.js';
 import SettingsGeneralTab from './SettingsGeneralTab.js';
-import SettingsPacksTab from './SettingsPacksTab.js';
+import SettingsMarketplacesTab from './SettingsMarketplacesTab.js';
+
+const ACCENT_COLORS: Record<Settings['accentColor'], string> = {
+  primary: '#6a5acd',
+  boost: '#4f46e5',
+  blue: '#4c6ef5',
+  green: '#23ce6b',
+  red: '#ef4444'
+};
+
+const FONT_SIZES: Record<NonNullable<Settings['fontSize']>, string> = {
+  small: '12px',
+  medium: '14px',
+  large: '16px'
+};
+
+// Apply visual settings immediately (no waiting for save)
+const applyVisualSettings = (settings: Settings) => {
+  const root = document.documentElement;
+  root.style.setProperty('--color-accent-primary', ACCENT_COLORS[settings.accentColor]);
+  root.style.fontSize = FONT_SIZES[settings.fontSize ?? 'medium'];
+  root.classList.toggle('reduce-motion', settings.reduceMotion === true);
+};
 
 interface Props {
   open: boolean;
@@ -13,32 +36,18 @@ interface Props {
 
 const SettingsModalContent: React.FC<Props> = ({ open }) => {
   const { refresh } = useSettings();
-  const { t } = useTranslation();
   const [formValues, setFormValues] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [status, setStatus] = useState<string>();
-  const [error, setError] = useState<string>();
-  const [tab, setTab] = useState<'general' | 'packs'>('general');
+  const [tab, setTab] = useState<'general' | 'marketplace'>('general');
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const loadSettingsFile = async () => {
     setLoading(true);
-    setStatus(undefined);
-    setError(undefined);
     try {
-      const [rawRes] = await Promise.all([window.projecthub.readRawSettings()]);
-
+      const rawRes = await window.projecthub.readRawSettings();
       if (rawRes.ok && typeof rawRes.data === 'string') {
-        try {
-          const parsed = JSON.parse(rawRes.data) as Settings;
-          setFormValues(parsed);
-        } catch (parseError) {
-          setError(`Invalid settings JSON: ${(parseError as Error).message}`);
-          setFormValues(null);
-        }
-      } else {
-        setError(rawRes.error || 'Unable to read settings file');
-        setFormValues(null);
+        const parsed = JSON.parse(rawRes.data) as Settings;
+        setFormValues(parsed);
       }
     } finally {
       setLoading(false);
@@ -48,59 +57,104 @@ const SettingsModalContent: React.FC<Props> = ({ open }) => {
   useEffect(() => {
     if (open) {
       loadSettingsFile();
+      setTab('general');
     }
   }, [open]);
 
-  const updateField = <K extends keyof Settings>(key: K, value: Settings[K]) => {
-    setFormValues((prev) => (prev ? { ...prev, [key]: value } : prev));
-  };
-
-  const handleSave = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!formValues) return;
-
-    setSaving(true);
-    setStatus(undefined);
-    setError(undefined);
-
-    const res = await window.projecthub.updateSettings(formValues);
-    if (res.ok && res.data) {
-      setStatus(t('settingsSaved'));
+  // Auto-save with debounce
+  const saveSettings = useCallback(async (settings: Settings) => {
+    const res = await window.projecthub.updateSettings(settings);
+    if (res.ok) {
       await refresh();
-    } else {
-      setError(res.error || 'Failed to save settings');
     }
-    setSaving(false);
+  }, [refresh]);
+
+  const updateField = useCallback(<K extends keyof Settings>(key: K, value: Settings[K]) => {
+    setFormValues((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, [key]: value };
+
+      // Apply visual changes immediately
+      applyVisualSettings(next);
+
+      // Debounce the actual save
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      saveTimeoutRef.current = setTimeout(() => {
+        saveSettings(next);
+      }, 300);
+
+      return next;
+    });
+  }, [saveSettings]);
+
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const handleOpenDataFolder = () => {
+    if (formValues?.installPath) {
+      window.projecthub.openFolder(formValues.installPath);
+    }
   };
 
-  const isReady = Boolean(formValues) && !loading;
+  if (loading || !formValues) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <span className="text-sm text-white/50">Loading...</span>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col h-full space-y-4">
-      <div className="flex gap-2 shrink-0">
-        <Button type="button" variant={tab === 'general' ? 'primary' : 'ghost'} onClick={() => setTab('general')}>
-          General
-        </Button>
-        <Button type="button" variant={tab === 'packs' ? 'primary' : 'ghost'} onClick={() => setTab('packs')}>
-          Packs
-        </Button>
+    <div className="flex flex-col h-full">
+      {/* Tabs */}
+      <div className="flex gap-1 mb-4 shrink-0">
+        <button
+          type="button"
+          onClick={() => setTab('general')}
+          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+            tab === 'general'
+              ? 'bg-brand-accent-primary text-white'
+              : 'text-white/60 hover:text-white hover:bg-white/5'
+          }`}
+        >
+          Settings
+        </button>
+        <button
+          type="button"
+          onClick={() => setTab('marketplace')}
+          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+            tab === 'marketplace'
+              ? 'bg-brand-accent-primary text-white'
+              : 'text-white/60 hover:text-white hover:bg-white/5'
+          }`}
+        >
+          Marketplace
+        </button>
       </div>
 
+      {/* Content */}
       <div className="flex-1 min-h-0 overflow-hidden">
         {tab === 'general' ? (
-          <SettingsGeneralTab
-            formValues={formValues}
-            isReady={isReady}
-            saving={saving}
-            status={status}
-            error={error}
-            onUpdate={updateField}
-            onSave={handleSave}
-            onReload={loadSettingsFile}
-          />
+          <SettingsGeneralTab settings={formValues} onUpdate={updateField} />
         ) : (
-          <SettingsPacksTab repoUrl={formValues?.packsRepoUrl} />
+          <SettingsMarketplacesTab />
         )}
+      </div>
+
+      {/* Footer */}
+      <div className="mt-4 pt-4 border-t border-brand-divider/30 flex items-center justify-between shrink-0">
+        <span className="text-xs text-white/40">ProjectHub v{pkg.version}</span>
+        <Button type="button" variant="ghost" onClick={handleOpenDataFolder} className="text-xs">
+          <FolderOpen size={14} className="mr-1.5" />
+          Open Data Folder
+        </Button>
       </div>
     </div>
   );

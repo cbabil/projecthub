@@ -82,7 +82,7 @@ const Modal: React.FC<Props> = ({ open, title, onClose, children, footer }) => {
         aria-labelledby="modal-title"
         onKeyDown={handleKeyDown}
         tabIndex={-1}
-        className="bg-[#131328] border border-[#6a5afd]/70 rounded-2xl w-[900px] max-w-[95vw] h-[540px] max-h-[85vh] flex flex-col shadow-[0_24px_70px_rgba(0,0,0,0.65)] outline-none"
+        className="bg-[#131328] border border-[#6a5afd]/70 rounded-2xl w-[90vw] max-w-[1100px] h-[80vh] max-h-[750px] min-h-[400px] flex flex-col shadow-[0_24px_70px_rgba(0,0,0,0.65)] outline-none"
       >
         <header className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2 min-w-0">

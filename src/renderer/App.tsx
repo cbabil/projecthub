@@ -9,6 +9,7 @@ import { useSettingsEvents } from './listeners/useSettingsEvents.js';
 // Lazy load pages for code splitting
 const Projects = lazy(() => import('./pages/Projects.js'));
 const Templates = lazy(() => import('./pages/Templates.js'));
+const Marketplace = lazy(() => import('./pages/Marketplace.js'));
 const Libraries = lazy(() => import('./pages/Libraries.js'));
 const SettingsPage = lazy(() => import('./pages/Settings.js'));
 
@@ -21,6 +22,7 @@ const PageLoader: React.FC = () => (
 const routes = {
   projects: { title: 'Projects', Component: Projects },
   templates: { title: 'Templates', Component: Templates },
+  marketplace: { title: 'Marketplace', Component: Marketplace },
   libraries: { title: 'Libraries', Component: Libraries },
   settings: { title: 'Settings', Component: SettingsPage }
 };

@@ -29,6 +29,13 @@ const applyTheme = (settings: Settings) => {
   root.classList.toggle('dark', isDark);
   root.classList.toggle('light', !isDark);
   root.style.setProperty('--color-accent-primary', ACCENT_COLORS[settings.accentColor]);
+
+  // Apply font size directly on html element (Tailwind uses rem)
+  const fontSizes = { small: '12px', medium: '14px', large: '16px' };
+  root.style.fontSize = fontSizes[settings.fontSize ?? 'medium'];
+
+  // Apply reduce motion
+  root.classList.toggle('reduce-motion', settings.reduceMotion === true);
 };
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

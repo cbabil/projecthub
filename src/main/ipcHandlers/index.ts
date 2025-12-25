@@ -1,3 +1,4 @@
+import { registerMarketplaceHandlers } from './marketplace.js';
 import { registerPacksHandlers } from './packs.js';
 import { registerProjectsHandlers } from './projects.js';
 import { registerSettingsHandlers } from './settings.js';
@@ -10,4 +11,5 @@ export const registerIpcHandlers = () => {
   registerTemplatesHandlers();
   registerProjectsHandlers();
   registerWindowHandlers();
+  registerMarketplaceHandlers();
 };

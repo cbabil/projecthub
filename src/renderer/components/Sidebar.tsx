@@ -1,7 +1,6 @@
-import { FileJson, Folder, Library } from 'lucide-react';
+import { FileJson, Folder, Library, Store } from 'lucide-react';
 import React from 'react';
 
-import pkg from '../../../package.json';
 import { useData } from '../context/DataContext.js';
 import { ProjectHubNav } from '../types/navigation.js';
 
@@ -98,7 +97,20 @@ const Sidebar: React.FC<Props> = ({ active, onSelect }) => {
         <span className="text-sm">Libraries <span className="text-[11px] text-brand-text-dark/70">(Coming soon)</span></span>
       </button>
 
-      <div className="mt-auto text-xs text-brand-text-dark/60 text-center">v{pkg.version}</div>
+      <div className="mt-auto pt-4 border-t border-brand-divider/20">
+        <button
+          className={`flex w-full items-center gap-2 px-3 py-2 rounded-md text-left transition cursor-pointer ${
+            active === 'marketplace' ? 'bg-brand-accent-primary text-white' : 'hover:bg-brand-divider/30'
+          }`}
+          onClick={() => {
+            logNav('marketplace');
+            onSelect('marketplace');
+          }}
+        >
+          <Store size={18} />
+          <span className="text-sm">Marketplace</span>
+        </button>
+      </div>
     </aside>
   );
 };

@@ -28,9 +28,20 @@
 On first launch, ProjectHub sets up its data folder at `~/.projecthub`.
 
 ## Use ProjectHub
-- Add your own templates and libraries into the data folder (they appear in the app automatically).
-- Click **New Project**, choose templates and libraries, review, and create.
-- ProjectHub saves the project entry and scaffolds the files/folders to your chosen destination.
+- Install packs from the **official marketplace** or add custom marketplaces
+- Click **New Project**, choose templates and libraries, review, and create
+- ProjectHub scaffolds the files/folders to your chosen destination
+
+## Packs & Marketplaces
+
+ProjectHub uses a **marketplace** system for distributing template packs:
+
+- **Official Marketplace** – Built-in, includes `react-pack` and `python-pack`
+- **Custom Marketplaces** – Add your team's or community pack sources via `owner/repo`
+
+Click **Marketplace** in the sidebar to browse and install packs. Use **category filters** (Frontend, Backend, Fullstack, Configuration) to narrow results, and hover over the **info icon** on any pack card for details. Manage marketplace sources in **Settings → Marketplace**.
+
+Browse the [ProjectHub Packs](https://github.com/cbabil/projecthub-packs) repository for available packs, or [create your own marketplace](https://github.com/cbabil/projecthub-packs/wiki/Authoring-a-pack#creating-your-own-marketplace).
 
 ## Documentation
 - Browse the [Wiki](../../projecthub.wiki) for guides, flows, and troubleshooting.

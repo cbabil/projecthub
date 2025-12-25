@@ -1,6 +1,6 @@
 {
   "name": "projecthub",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "ProjectHub",
   "author": "cbabil",
   "packageManager": "yarn@1.22.22",

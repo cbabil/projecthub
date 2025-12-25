@@ -1,4 +1,4 @@
-import { LibraryMeta, OperationResult, PlatformSettings, ProjectMeta, Settings, TemplateMeta } from '@shared/types.js';
+import { LibraryMeta, Marketplace, OperationResult, PlatformSettings, ProjectMeta, Settings, TemplateMeta } from '@shared/types.js';
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron';
 
 const api = {
@@ -21,6 +21,8 @@ const api = {
     ipcRenderer.invoke('filesystem:removePack', payload) as Promise<OperationResult<null>>,
   clearPacksCache: () => ipcRenderer.invoke('filesystem:clearPacksCache') as Promise<OperationResult<null>>,
   fetchManifest: (url: string) => ipcRenderer.invoke('packs:fetchManifest', url) as Promise<OperationResult<unknown>>,
+  loadMarketplaces: () => ipcRenderer.invoke('marketplace:load') as Promise<OperationResult<Marketplace[]>>,
+  saveMarketplaces: (marketplaces: Marketplace[]) => ipcRenderer.invoke('marketplace:save', marketplaces) as Promise<OperationResult<Marketplace[]>>,
   createProject: (fileName: string, payload: ProjectMeta) => ipcRenderer.invoke('filesystem:writeJson', fileName, payload) as Promise<OperationResult<ProjectMeta>>,
   createProjectFromTemplates: (payload: { name: string; version?: string; destination: string; templates: TemplateMeta[]; libraries: string[]; description?: string }) =>
     ipcRenderer.invoke('filesystem:createProjectFromTemplates', payload) as Promise<OperationResult<ProjectMeta>>,

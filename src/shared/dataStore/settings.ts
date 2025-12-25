@@ -1,6 +1,14 @@
 import fs from 'fs/promises';
 
-import { DEFAULT_SETTINGS, DEFAULT_TITLEBAR, PACKS_DIR, PROJECTS_DIR, ROOT_DIR, SETTINGS_PATH } from '../constants.js';
+import {
+  DEFAULT_SETTINGS,
+  DEFAULT_TITLEBAR,
+  MARKETPLACE_DIR,
+  PACKS_DIR,
+  PROJECTS_DIR,
+  ROOT_DIR,
+  SETTINGS_PATH
+} from '../constants.js';
 import type { OperationResult, PlatformSettings, Settings } from '../types.js';
 import { encoder, readJson, writeJson } from './utils.js';
 
@@ -14,7 +22,7 @@ export const loadPlatformSettings = (platform: NodeJS.Platform = process.platfor
 };
 
 export async function ensureRoots(): Promise<void> {
-  const dirs = [ROOT_DIR, PROJECTS_DIR, PACKS_DIR];
+  const dirs = [ROOT_DIR, PROJECTS_DIR, PACKS_DIR, MARKETPLACE_DIR];
   await Promise.all(dirs.map((dir) => fs.mkdir(dir, { recursive: true })));
   try {
     await fs.access(SETTINGS_PATH);
@@ -27,6 +35,7 @@ export async function loadSettings(): Promise<OperationResult<Settings>> {
   await ensureRoots();
   const res = await readJson<Settings>(SETTINGS_PATH);
   if (!res.ok || !res.data) return { ok: false, error: res.error };
+
   return {
     ok: true,
     data: {
