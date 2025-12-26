@@ -104,7 +104,7 @@ const Grid = <T extends BaseMeta>({
           <div>{renderSuffix}</div>
         </div>
       )}
-      <div className="flex-1">
+      <div className="flex-1 h-full">
         {items.length ? (
           <Table
             columns={columns}
@@ -114,7 +114,7 @@ const Grid = <T extends BaseMeta>({
             pageSize={pageSize}
             sortable
             onRowClick={handleRowClick}
-            className="app-surface"
+            className="app-surface h-full"
           />
         ) : (
           <div className="app-surface flex flex-col items-center justify-center h-full">

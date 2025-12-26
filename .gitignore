@@ -37,3 +37,4 @@ Thumbs.db
 
 # Docs
 docs/
+.playwright-mcp/
