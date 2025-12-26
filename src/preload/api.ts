@@ -8,12 +8,16 @@ const api = {
   getSettingsPath: () => ipcRenderer.invoke('settings:get-path') as Promise<string>,
   getPlatformSettings: () => ipcRenderer.invoke('app:get-platform-settings') as Promise<PlatformSettings>,
   listTemplates: (source?: string) => ipcRenderer.invoke('filesystem:listTemplates', source) as Promise<OperationResult<TemplateMeta[]>>,
-  listLibraries: () => ipcRenderer.invoke('filesystem:listLibraries') as Promise<OperationResult<LibraryMeta[]>>,
+  listLibraries: (source?: string) => ipcRenderer.invoke('filesystem:listLibraries', source) as Promise<OperationResult<LibraryMeta[]>>,
   listProjects: () => ipcRenderer.invoke('filesystem:listProjects') as Promise<OperationResult<ProjectMeta[]>>,
   listTemplateFolders: () => ipcRenderer.invoke('filesystem:listTemplateFolders') as Promise<OperationResult<string[]>>,
   readTemplate: (templatePath: string) => ipcRenderer.invoke('filesystem:readTemplate', templatePath) as Promise<OperationResult<string>>,
   updateTemplate: (payload: { templatePath: string; content: string }) =>
     ipcRenderer.invoke('filesystem:updateTemplate', payload) as Promise<OperationResult<null>>,
+  readLibrary: (libraryPath: string) => ipcRenderer.invoke('filesystem:readLibrary', libraryPath) as Promise<OperationResult<string>>,
+  updateLibrary: (payload: { libraryPath: string; content: string }) =>
+    ipcRenderer.invoke('filesystem:updateLibrary', payload) as Promise<OperationResult<null>>,
+  deleteLibrary: (relativePath: string) => ipcRenderer.invoke('filesystem:deleteLibrary', relativePath) as Promise<OperationResult<null>>,
   listPacks: () => ipcRenderer.invoke('filesystem:listPacks') as Promise<OperationResult<import('@shared/types.js').PackMeta[]>>,
   installPack: (payload: { url: string; checksum?: string }) =>
     ipcRenderer.invoke('filesystem:installPack', payload) as Promise<OperationResult<null>>,
@@ -47,6 +51,20 @@ const api = {
   ipc: {
     on: (channel: string, listener: (...args: unknown[]) => void) => ipcRenderer.on(channel, (_event, ...args) => listener(...args)),
     removeAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel)
+  },
+  // AI
+  aiTestConnection: (provider: string, config: unknown) =>
+    ipcRenderer.invoke('ai:test-connection', provider, config) as Promise<OperationResult<boolean>>,
+  aiListOllamaModels: (endpoint: string) =>
+    ipcRenderer.invoke('ai:list-ollama-models', endpoint) as Promise<OperationResult<string[]>>,
+  aiChat: (provider: string, config: unknown, messages: unknown[]) =>
+    ipcRenderer.invoke('ai:chat', provider, config, messages) as Promise<OperationResult<null>>,
+  aiEncryptKey: (key: string) => ipcRenderer.invoke('ai:encrypt-key', key) as Promise<string>,
+  aiDecryptKey: (encrypted: string) => ipcRenderer.invoke('ai:decrypt-key', encrypted) as Promise<string>,
+  onAIStream: (listener: (chunk: unknown) => void) => {
+    const handler = (_event: IpcRendererEvent, chunk: unknown) => listener(chunk);
+    ipcRenderer.on('ai:stream', handler);
+    return () => ipcRenderer.removeListener('ai:stream', handler);
   },
   log: (level: 'log' | 'info' | 'warn' | 'error' | 'debug', ...args: unknown[]) => ipcRenderer.invoke('log:renderer', level, ...args),
   logCacheFilter: (category: string | undefined, count: number) => ipcRenderer.invoke('cache:filter-log', { category, count })

@@ -1,4 +1,4 @@
-import { TemplateMeta } from '@shared/types';
+import { LibraryMeta } from '@shared/types';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import React from 'react';
 
@@ -6,13 +6,13 @@ import type { GridColumn } from '../hooks/useDataGrid.js';
 import { formatDate, truncate } from '../utils/text.js';
 
 interface ActionHandlers {
-  onView: (row: TemplateMeta) => void;
-  onEdit: (row: TemplateMeta) => void;
-  onDelete: (row: TemplateMeta) => void;
+  onView: (row: LibraryMeta) => void;
+  onEdit: (row: LibraryMeta) => void;
+  onDelete: (row: LibraryMeta) => void;
 }
 
-/** Build columns for Templates page grid */
-export const buildTemplatesColumns = (handlers: ActionHandlers): GridColumn<TemplateMeta>[] => [
+/** Build columns for Libraries page grid */
+export const buildLibrariesColumns = (handlers: ActionHandlers): GridColumn<LibraryMeta>[] => [
   { id: 'name', label: 'Name', accessor: (row) => row.name, sortable: true, sortValue: (row) => row.name, width: '140px' },
   {
     id: 'description',
@@ -25,7 +25,7 @@ export const buildTemplatesColumns = (handlers: ActionHandlers): GridColumn<Temp
   {
     id: 'category',
     label: 'Category',
-    accessor: (row) => row.category ?? 'templates',
+    accessor: (row) => row.category ?? 'library',
     sortable: true,
     sortValue: (row) => row.category ?? '',
     width: '110px'
@@ -45,18 +45,18 @@ export const buildTemplatesColumns = (handlers: ActionHandlers): GridColumn<Temp
     headerAlign: 'center',
     accessor: (row) => (
       <div className="flex justify-center gap-2" onClick={(e) => e.stopPropagation()}>
-        <button className="p-1 text-brand-text-dark hover:text-brand-accent-boost" onClick={() => handlers.onView(row)} aria-label="View template">
+        <button className="p-1 text-brand-text-dark hover:text-brand-accent-boost" onClick={() => handlers.onView(row)} aria-label="View library">
           <Eye size={16} />
         </button>
         <button
           className={`p-1 ${row.editable ? 'text-brand-text-dark hover:text-brand-accent-primary' : 'text-brand-divider/70 cursor-default'}`}
           onClick={() => handlers.onEdit(row)}
-          aria-label="Edit template"
+          aria-label="Edit library"
           disabled={!row.editable}
         >
           <Pencil size={16} />
         </button>
-        <button className="p-1 text-brand-text-dark hover:text-brand-accent-red" onClick={() => handlers.onDelete(row)} aria-label="Delete template">
+        <button className="p-1 text-brand-text-dark hover:text-brand-accent-red" onClick={() => handlers.onDelete(row)} aria-label="Delete library">
           <Trash2 size={16} />
         </button>
       </div>

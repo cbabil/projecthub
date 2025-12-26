@@ -1,10 +1,13 @@
 import { TemplateMeta } from '@shared/types';
-import { FileJson } from 'lucide-react';
+import { FileJson, Sparkles } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import YAML from 'yaml';
 
+import AIChat from '../components/ai/AIChat.js';
+import AISetupWizard from '../components/ai/AISetupWizard.js';
 import EditorModal from '../components/EditorModal.js';
 import Grid from '../components/Grid.js';
+import { useAI } from '../context/AIContext.js';
 import { useData } from '../context/DataContext.js';
 import { useToast } from '../context/ToastContext.js';
 import { useTranslation } from '../context/TranslationContext.js';
@@ -16,8 +19,19 @@ const Templates: React.FC = () => {
   const { refreshAll } = useData();
   const { t } = useTranslation();
   const toast = useToast();
+  const { isConfigured } = useAI();
   const [selected, setSelected] = useState<TemplateMeta | null>(null);
   const [mode, setMode] = useState<'view' | 'edit'>('view');
+  const [showAIChat, setShowAIChat] = useState(false);
+  const [showAISetup, setShowAISetup] = useState(false);
+
+  const handleAIClick = () => {
+    if (isConfigured) {
+      setShowAIChat(true);
+    } else {
+      setShowAISetup(true);
+    }
+  };
 
   // Trigger one cache read when Templates is opened
   const didTemplatesClickLoad = React.useRef(false);
@@ -95,6 +109,15 @@ const Templates: React.FC = () => {
         emptyTitle={t('templatesEmptyTitle')}
         emptyMessage={t('templatesEmptyMessage')}
         renderPrefix={<h2 className="text-lg font-semibold">{t('templatesTitle')}</h2>}
+        renderSuffix={
+          <button
+            onClick={handleAIClick}
+            className="button-primary flex items-center gap-2 text-sm font-medium"
+          >
+            <Sparkles size={16} />
+            Generate with AI
+          </button>
+        }
         renderCategory={(item) => (item as TemplateMeta).category || 'templates'}
         pageSize={10}
         columns={columns}
@@ -116,6 +139,22 @@ const Templates: React.FC = () => {
             if (success) await refreshAll();
           }}
           languageLabel="YAML"
+        />
+      )}
+      {showAISetup && (
+        <AISetupWizard
+          onClose={() => setShowAISetup(false)}
+          onSuccess={() => {
+            setShowAISetup(false);
+            setShowAIChat(true);
+          }}
+        />
+      )}
+      {showAIChat && (
+        <AIChat
+          onClose={() => setShowAIChat(false)}
+          onSaveTemplate={() => {}}
+          onCreateProject={() => {}}
         />
       )}
     </div>

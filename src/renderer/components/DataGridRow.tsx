@@ -21,7 +21,7 @@ interface DataGridRowProps<T> {
 const DataGridRow = <T,>({ row, rowId, columns, selectionMode, isSelected, gridTemplateColumns, onToggle }: DataGridRowProps<T>) => (
   <div
     key={rowId}
-    className={`grid-row gap-3 px-4 py-2 items-center cursor-pointer ${isSelected ? 'grid-row--selected text-white' : ''}`}
+    className={`grid-row gap-3 px-4 py-2 items-center cursor-pointer w-full ${isSelected ? 'grid-row--selected text-white' : ''}`}
     style={{ display: 'grid', gridTemplateColumns }}
     onClick={onToggle}
   >

@@ -30,7 +30,19 @@ On first launch, ProjectHub sets up its data folder at `~/.projecthub`.
 ## Use ProjectHub
 - Install packs from the **official marketplace** or add custom marketplaces
 - Click **New Project**, choose templates and libraries, review, and create
+- Use **AI Templates** to generate custom templates with natural language
 - ProjectHub scaffolds the files/folders to your chosen destination
+
+## AI Templates
+
+Generate templates using AI—just describe what you need:
+
+- **Multi-provider support** – Choose between Anthropic (Claude), OpenAI (GPT-4), or Ollama (local)
+- **Chat-based** – Iteratively refine your template through conversation
+- **Integrated** – Access AI from Templates or Libraries pages via the "Generate with AI" button
+- **Secure** – API keys encrypted at rest, never exposed to the renderer process
+
+First-time setup walks you through provider configuration. See **Settings → AI** to manage providers.
 
 ## Packs & Marketplaces
 

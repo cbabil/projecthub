@@ -1,3 +1,5 @@
+import type { AISettings } from './ai/types.js';
+
 export type ThemeMode = 'dark' | 'light';
 export type AccentColor = 'primary' | 'boost' | 'blue' | 'green' | 'red';
 export type FontSize = 'small' | 'medium' | 'large';
@@ -57,6 +59,7 @@ export interface Settings {
   reduceMotion?: boolean;
   window?: WindowConfig;
   titleBar?: TitleBarConfig;
+  ai?: AISettings;
 }
 
 export interface BaseMeta {
@@ -100,8 +103,12 @@ export interface TemplateMeta extends BaseMeta {
 
 export interface LibraryMeta extends BaseMeta {
   type: 'library';
+  id?: string;
   files?: Record<string, string>;
   category?: string;
+  sourcePath?: string;
+  packPath?: string;
+  editable?: boolean;
 }
 
 export interface ProjectMeta extends BaseMeta {

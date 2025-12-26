@@ -1,6 +1,6 @@
 {
   "name": "projecthub",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "ProjectHub",
   "author": "cbabil",
   "packageManager": "yarn@1.22.22",
@@ -42,9 +42,11 @@
     }
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.71.2",
     "@electron-toolkit/utils": "^2.0.0",
     "adm-zip": "0.5.10",
     "lucide-react": "^0.425.0",
+    "openai": "^6.15.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "yaml": "2.4.5"
