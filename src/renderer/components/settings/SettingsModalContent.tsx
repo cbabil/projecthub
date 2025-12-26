@@ -5,6 +5,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import pkg from '../../../../package.json';
 import { useSettings } from '../../context/SettingsContext.js';
 import Button from '../Button.js';
+import SettingsAITab from './SettingsAITab.js';
 import SettingsGeneralTab from './SettingsGeneralTab.js';
 import SettingsMarketplacesTab from './SettingsMarketplacesTab.js';
 
@@ -38,7 +39,7 @@ const SettingsModalContent: React.FC<Props> = ({ open }) => {
   const { refresh } = useSettings();
   const [formValues, setFormValues] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState<'general' | 'marketplace'>('general');
+  const [tab, setTab] = useState<'general' | 'marketplace' | 'ai'>('general');
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   const loadSettingsFile = async () => {
@@ -73,28 +74,15 @@ const SettingsModalContent: React.FC<Props> = ({ open }) => {
     setFormValues((prev) => {
       if (!prev) return prev;
       const next = { ...prev, [key]: value };
-
-      // Apply visual changes immediately
       applyVisualSettings(next);
-
-      // Debounce the actual save
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-      saveTimeoutRef.current = setTimeout(() => {
-        saveSettings(next);
-      }, 300);
-
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = setTimeout(() => saveSettings(next), 300);
       return next;
     });
   }, [saveSettings]);
 
-  useEffect(() => {
-    return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-    };
+  useEffect(() => () => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
   }, []);
 
   const handleOpenDataFolder = () => {
@@ -111,44 +99,39 @@ const SettingsModalContent: React.FC<Props> = ({ open }) => {
     );
   }
 
+  const tabs: Array<{ id: 'general' | 'marketplace' | 'ai'; label: string }> = [
+    { id: 'general', label: 'Settings' },
+    { id: 'ai', label: 'AI' },
+    { id: 'marketplace', label: 'Marketplace' }
+  ];
+
   return (
     <div className="flex flex-col h-full">
-      {/* Tabs */}
       <div className="flex gap-1 mb-4 shrink-0">
-        <button
-          type="button"
-          onClick={() => setTab('general')}
-          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-            tab === 'general'
-              ? 'bg-brand-accent-primary text-white'
-              : 'text-white/60 hover:text-white hover:bg-white/5'
-          }`}
-        >
-          Settings
-        </button>
-        <button
-          type="button"
-          onClick={() => setTab('marketplace')}
-          className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-            tab === 'marketplace'
-              ? 'bg-brand-accent-primary text-white'
-              : 'text-white/60 hover:text-white hover:bg-white/5'
-          }`}
-        >
-          Marketplace
-        </button>
+        {tabs.map(({ id, label }) => (
+          <button
+            key={id}
+            type="button"
+            onClick={() => setTab(id)}
+            className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+              tab === id
+                ? 'bg-brand-accent-primary text-white'
+                : 'text-white/60 hover:text-white hover:bg-white/5'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
       </div>
-
-      {/* Content */}
       <div className="flex-1 min-h-0 overflow-hidden">
         {tab === 'general' ? (
           <SettingsGeneralTab settings={formValues} onUpdate={updateField} />
+        ) : tab === 'ai' ? (
+          <SettingsAITab />
         ) : (
           <SettingsMarketplacesTab />
         )}
       </div>
-
-      {/* Footer */}
       <div className="mt-4 pt-4 border-t border-brand-divider/30 flex items-center justify-between shrink-0">
         <span className="text-xs text-white/40">ProjectHub v{pkg.version}</span>
         <Button type="button" variant="ghost" onClick={handleOpenDataFolder} className="text-xs">
