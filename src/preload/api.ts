@@ -52,6 +52,20 @@ const api = {
     on: (channel: string, listener: (...args: unknown[]) => void) => ipcRenderer.on(channel, (_event, ...args) => listener(...args)),
     removeAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel)
   },
+  // AI
+  aiTestConnection: (provider: string, config: unknown) =>
+    ipcRenderer.invoke('ai:test-connection', provider, config) as Promise<OperationResult<boolean>>,
+  aiListOllamaModels: (endpoint: string) =>
+    ipcRenderer.invoke('ai:list-ollama-models', endpoint) as Promise<OperationResult<string[]>>,
+  aiChat: (provider: string, config: unknown, messages: unknown[]) =>
+    ipcRenderer.invoke('ai:chat', provider, config, messages) as Promise<OperationResult<null>>,
+  aiEncryptKey: (key: string) => ipcRenderer.invoke('ai:encrypt-key', key) as Promise<string>,
+  aiDecryptKey: (encrypted: string) => ipcRenderer.invoke('ai:decrypt-key', encrypted) as Promise<string>,
+  onAIStream: (listener: (chunk: unknown) => void) => {
+    const handler = (_event: IpcRendererEvent, chunk: unknown) => listener(chunk);
+    ipcRenderer.on('ai:stream', handler);
+    return () => ipcRenderer.removeListener('ai:stream', handler);
+  },
   log: (level: 'log' | 'info' | 'warn' | 'error' | 'debug', ...args: unknown[]) => ipcRenderer.invoke('log:renderer', level, ...args),
   logCacheFilter: (category: string | undefined, count: number) => ipcRenderer.invoke('cache:filter-log', { category, count })
 };
