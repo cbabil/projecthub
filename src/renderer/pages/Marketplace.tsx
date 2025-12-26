@@ -1,10 +1,10 @@
 import { Loader2, RefreshCw, Store } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Search } from 'ui-toolkit';
 
 import { PACK_CATEGORIES } from '../../shared/marketplace.constants.js';
 import MarketplaceFilters, { SortBy, StatusFilter } from '../components/MarketplaceFilters.js';
 import PackCard from '../components/PackCard.js';
-import Search from '../components/Search.js';
 import { usePacks } from '../context/PacksContext.js';
 import { useToast } from '../context/ToastContext.js';
 

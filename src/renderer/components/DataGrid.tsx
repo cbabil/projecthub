@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { Search } from 'ui-toolkit';
 
 import type { SortDirection } from '../hooks/useDataGrid.js';
 import { useDataGrid } from '../hooks/useDataGrid.js';
@@ -7,7 +8,6 @@ import DataGridFillerRows from './DataGridFillerRows.js';
 import DataGridHeader from './DataGridHeader.js';
 import DataGridPagination from './DataGridPagination.js';
 import DataGridRow from './DataGridRow.js';
-import Search from './Search.js';
 
 const DataGrid = <T,>({
   rows,

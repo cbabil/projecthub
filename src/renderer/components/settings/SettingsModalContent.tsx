@@ -1,10 +1,10 @@
 import type { Settings } from '@shared/types';
 import { FolderOpen } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Button } from 'ui-toolkit';
 
 import pkg from '../../../../package.json';
 import { useSettings } from '../../context/SettingsContext.js';
-import Button from '../Button.js';
 import SettingsAITab from './SettingsAITab.js';
 import SettingsGeneralTab from './SettingsGeneralTab.js';
 import SettingsMarketplacesTab from './SettingsMarketplacesTab.js';
@@ -40,7 +40,7 @@ const SettingsModalContent: React.FC<Props> = ({ open }) => {
   const [formValues, setFormValues] = useState<Settings | null>(null);
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState<'general' | 'marketplace' | 'ai'>('general');
-  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const loadSettingsFile = async () => {
     setLoading(true);

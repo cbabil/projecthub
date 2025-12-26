@@ -44,7 +44,7 @@ const ProjectsWizard: React.FC<Props> = ({ onClose, onCreated }) => {
   const [status, setStatus] = useState<string>();
   const [error, setError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const closeTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => () => {
     if (closeTimerRef.current) {

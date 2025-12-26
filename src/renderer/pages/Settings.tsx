@@ -1,8 +1,7 @@
 import type { PackMeta } from '@shared/types.js';
 import React, { useEffect, useState } from 'react';
+import { Button, Input } from 'ui-toolkit';
 
-import Button from '../components/Button.js';
-import Input from '../components/Input.js';
 import { useSettings } from '../context/SettingsContext.js';
 import { useToast } from '../context/ToastContext.js';
 import { useTranslation } from '../context/TranslationContext.js';

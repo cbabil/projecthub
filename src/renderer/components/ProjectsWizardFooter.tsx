@@ -1,6 +1,5 @@
 import React from 'react';
-
-import Button from './Button.js';
+import { Button } from 'ui-toolkit';
 
 interface Props {
   step: number;
