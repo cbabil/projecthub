@@ -1,4 +1,5 @@
 import './styles.css';
+import 'ui-toolkit/dist/style.css';
 
 import React from 'react';
 import ReactDOM from 'react-dom/client';
