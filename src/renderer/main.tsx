@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom/client';
 
 import App from './App.js';
 import ToastContainer from './components/Toast.js';
+import { AIProvider } from './context/AIContext.js';
 import { DataProvider } from './context/DataContext.js';
 import { MarketplaceProvider } from './context/MarketplaceContext.js';
 import { PacksProvider } from './context/PacksContext.js';
@@ -23,12 +24,14 @@ ReactDOM.createRoot(rootEl).render(
       <MarketplaceProvider>
         <ToastProvider>
           <PacksProvider>
-            <TranslationProvider>
-              <DataProvider>
-                <App />
-                <ToastContainer />
-              </DataProvider>
-            </TranslationProvider>
+            <AIProvider>
+              <TranslationProvider>
+                <DataProvider>
+                  <App />
+                  <ToastContainer />
+                </DataProvider>
+              </TranslationProvider>
+            </AIProvider>
           </PacksProvider>
         </ToastProvider>
       </MarketplaceProvider>
