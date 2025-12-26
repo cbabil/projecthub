@@ -45,7 +45,9 @@ export const AIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         setStreaming(false);
       }
     });
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+    };
   }, [streamContent]);
 
   const sendMessage = useCallback(
@@ -54,13 +56,12 @@ export const AIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       setMessages((prev) => [...prev, userMsg]);
       setStreaming(true);
 
-      const providerConfig = aiSettings[aiSettings.provider];
       const config =
         aiSettings.provider === 'ollama'
-          ? { endpoint: providerConfig.endpoint, model: providerConfig.model }
+          ? { endpoint: aiSettings.ollama.endpoint, model: aiSettings.ollama.model }
           : {
-              apiKey: await window.projecthub.aiDecryptKey(providerConfig.apiKey),
-              model: providerConfig.model
+              apiKey: await window.projecthub.aiDecryptKey(aiSettings[aiSettings.provider].apiKey),
+              model: aiSettings[aiSettings.provider].model
             };
 
       await window.projecthub.aiChat(aiSettings.provider, config, [...messages, userMsg]);

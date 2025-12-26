@@ -39,6 +39,21 @@ vi.mock('../src/renderer/context/ToastContext.js', () => ({
   ToastProvider: ({ children }: { children: React.ReactNode }) => children
 }));
 
+// Mock AIContext
+vi.mock('../src/renderer/context/AIContext.js', () => ({
+  useAI: () => ({
+    isConfigured: false,
+    settings: { provider: 'anthropic', anthropic: { apiKey: '', model: 'claude-sonnet-4-20250514' }, openai: { apiKey: '', model: 'gpt-4o' }, ollama: { endpoint: 'http://localhost:11434', model: 'llama3' } },
+    messages: [],
+    streaming: false,
+    sendMessage: vi.fn(),
+    clearChat: vi.fn(),
+    testConnection: vi.fn(),
+    updateProvider: vi.fn()
+  }),
+  AIProvider: ({ children }: { children: React.ReactNode }) => children
+}));
+
 if (!('projecthub' in window)) {
   (window as any).projecthub = {};
 }
