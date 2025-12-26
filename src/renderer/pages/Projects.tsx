@@ -1,7 +1,6 @@
 import { ProjectMeta } from '@shared/types';
 import { Folder, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
-import { Button } from 'ui-toolkit';
 
 import Grid from '../components/Grid.js';
 import Modal from '../components/Modal.js';
@@ -103,7 +102,7 @@ const Projects: React.FC = () => {
         emptyTitle={t('projectsEmptyTitle')}
         emptyMessage={t('projectsEmptyMessage')}
         renderPrefix={<h2 className="text-lg font-semibold">{t('projectsTitle')}</h2>}
-        renderSuffix={<Button size="sm" onClick={() => setWizardOpen(true)}>{t('projectsNewButton')}</Button>}
+        renderSuffix={<button className="button-primary text-sm" onClick={() => setWizardOpen(true)}>{t('projectsNewButton')}</button>}
         columns={columns}
         pageSize={10}
         fillContainer

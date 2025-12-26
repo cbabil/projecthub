@@ -1,7 +1,6 @@
 import { TemplateMeta } from '@shared/types';
 import { FileJson, Sparkles } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
-import { Button } from 'ui-toolkit';
 import YAML from 'yaml';
 
 import AIChat from '../components/ai/AIChat.js';
@@ -111,10 +110,10 @@ const Templates: React.FC = () => {
         emptyMessage={t('templatesEmptyMessage')}
         renderPrefix={<h2 className="text-lg font-semibold">{t('templatesTitle')}</h2>}
         renderSuffix={
-          <Button size="sm" onClick={handleAIClick}>
+          <button onClick={handleAIClick} className="button-primary flex items-center gap-2 text-sm">
             <Sparkles size={16} />
             Generate with AI
-          </Button>
+          </button>
         }
         renderCategory={(item) => (item as TemplateMeta).category || 'templates'}
         pageSize={10}

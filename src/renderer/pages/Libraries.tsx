@@ -1,7 +1,6 @@
 import { LibraryMeta } from '@shared/types';
 import { Library, Sparkles } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
-import { Button } from 'ui-toolkit';
 import YAML from 'yaml';
 
 import AIChat from '../components/ai/AIChat.js';
@@ -107,10 +106,10 @@ const Libraries: React.FC = () => {
         emptyMessage={t('librariesEmptyMessage')}
         renderPrefix={<h2 className="text-lg font-semibold">{t('librariesTitle')}</h2>}
         renderSuffix={
-          <Button size="sm" onClick={handleAIClick}>
+          <button onClick={handleAIClick} className="button-primary flex items-center gap-2 text-sm">
             <Sparkles size={16} />
             Generate with AI
-          </Button>
+          </button>
         }
         renderCategory={(item) => (item as LibraryMeta).category || 'library'}
         pageSize={10}
