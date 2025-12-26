@@ -1,7 +1,5 @@
 import React from 'react';
-
-import Button from '../Button.js';
-import Input from '../Input.js';
+import { Button, Input } from 'ui-toolkit';
 
 export type BasicsStepLabels = {
   name: string;

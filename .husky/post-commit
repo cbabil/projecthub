@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# Auto-tag when package.json version changes
+
+# Check if package.json was modified in this commit
+if git diff --name-only HEAD~1 HEAD 2>/dev/null | grep -q "^package.json$"; then
+  # Get the version from package.json
+  VERSION=$(node -p "require('./package.json').version")
+  TAG="v$VERSION"
+
+  # Check if tag already exists
+  if ! git tag -l "$TAG" | grep -q "$TAG"; then
+    echo "Creating tag $TAG for version $VERSION"
+    git tag "$TAG"
+    echo "Tag $TAG created. Push with: git push origin $TAG"
+  fi
+fi

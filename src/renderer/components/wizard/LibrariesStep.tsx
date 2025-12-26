@@ -1,8 +1,8 @@
 import { Library } from 'lucide-react';
 import React from 'react';
+import { Search } from 'ui-toolkit';
 
 import EmptyState from '../EmptyState.js';
-import Search from '../Search.js';
 
 type Props = {
   libraries: { name: string }[];

@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import DataGrid from '../src/renderer/components/DataGrid.js';
 import DataGridRow from '../src/renderer/components/DataGridRow.js';
-import Input from '../src/renderer/components/Input.js';
+import { Input } from 'ui-toolkit';
 
 describe('Input component', () => {
   it('invokes onChange handler with new value', () => {

@@ -1,8 +1,8 @@
 import { ProjectMeta } from '@shared/types';
 import { Folder, Trash2 } from 'lucide-react';
 import React, { useState } from 'react';
+import { Button } from 'ui-toolkit';
 
-import Button from '../components/Button.js';
 import Grid from '../components/Grid.js';
 import Modal from '../components/Modal.js';
 import ProjectsWizard from '../components/ProjectsWizard.js';
