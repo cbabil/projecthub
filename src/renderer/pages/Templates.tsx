@@ -108,17 +108,15 @@ const Templates: React.FC = () => {
         emptyIcon={FileJson}
         emptyTitle={t('templatesEmptyTitle')}
         emptyMessage={t('templatesEmptyMessage')}
-        renderPrefix={
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold flex-1">{t('templatesTitle')}</h2>
-            <button
-              onClick={handleAIClick}
-              className="px-3 py-2 text-sm bg-brand-accent-primary/20 text-brand-accent-primary rounded flex items-center gap-2 hover:bg-brand-accent-primary/30"
-            >
-              <Sparkles size={16} />
-              AI
-            </button>
-          </div>
+        renderPrefix={<h2 className="text-lg font-semibold">{t('templatesTitle')}</h2>}
+        renderSuffix={
+          <button
+            onClick={handleAIClick}
+            className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-600 to-brand-accent-primary text-white rounded-lg flex items-center gap-2 hover:from-purple-500 hover:to-brand-accent-primary/90 shadow-lg shadow-purple-500/25 transition-all"
+          >
+            <Sparkles size={16} />
+            Generate with AI
+          </button>
         }
         renderCategory={(item) => (item as TemplateMeta).category || 'templates'}
         pageSize={10}

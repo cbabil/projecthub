@@ -1,10 +1,13 @@
 import { LibraryMeta } from '@shared/types';
-import { Library } from 'lucide-react';
+import { Library, Sparkles } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
 import YAML from 'yaml';
 
+import AIChat from '../components/ai/AIChat.js';
+import AISetupWizard from '../components/ai/AISetupWizard.js';
 import EditorModal from '../components/EditorModal.js';
 import Grid from '../components/Grid.js';
+import { useAI } from '../context/AIContext.js';
 import { useData } from '../context/DataContext.js';
 import { useToast } from '../context/ToastContext.js';
 import { useTranslation } from '../context/TranslationContext.js';
@@ -15,9 +18,20 @@ const Libraries: React.FC = () => {
   const { libraries, loading, refreshAll } = useData();
   const { t } = useTranslation();
   const toast = useToast();
+  const { isConfigured } = useAI();
   const [selected, setSelected] = useState<LibraryMeta | null>(null);
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const [modalValue, setModalValue] = useState<string>('');
+  const [showAIChat, setShowAIChat] = useState(false);
+  const [showAISetup, setShowAISetup] = useState(false);
+
+  const handleAIClick = () => {
+    if (isConfigured) {
+      setShowAIChat(true);
+    } else {
+      setShowAISetup(true);
+    }
+  };
 
   // Trigger one cache read when Libraries is opened
   const didLibrariesClickLoad = React.useRef(false);
@@ -91,6 +105,15 @@ const Libraries: React.FC = () => {
         emptyTitle={t('librariesEmptyTitle')}
         emptyMessage={t('librariesEmptyMessage')}
         renderPrefix={<h2 className="text-lg font-semibold">{t('librariesTitle')}</h2>}
+        renderSuffix={
+          <button
+            onClick={handleAIClick}
+            className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-600 to-brand-accent-primary text-white rounded-lg flex items-center gap-2 hover:from-purple-500 hover:to-brand-accent-primary/90 shadow-lg shadow-purple-500/25 transition-all"
+          >
+            <Sparkles size={16} />
+            Generate with AI
+          </button>
+        }
         renderCategory={(item) => (item as LibraryMeta).category || 'library'}
         pageSize={10}
         columns={columns}
@@ -112,6 +135,22 @@ const Libraries: React.FC = () => {
             if (success) await refreshAll();
           }}
           languageLabel="YAML"
+        />
+      )}
+      {showAISetup && (
+        <AISetupWizard
+          onClose={() => setShowAISetup(false)}
+          onSuccess={() => {
+            setShowAISetup(false);
+            setShowAIChat(true);
+          }}
+        />
+      )}
+      {showAIChat && (
+        <AIChat
+          onClose={() => setShowAIChat(false)}
+          onSaveTemplate={() => {}}
+          onCreateProject={() => {}}
         />
       )}
     </div>
