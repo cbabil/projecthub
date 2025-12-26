@@ -23,7 +23,8 @@ export default defineConfig({
       '@renderer': path.resolve(__dirname, 'src/renderer'),
       '@main': path.resolve(__dirname, 'src/main'),
       '@preload': path.resolve(__dirname, 'src/preload'),
-      'ui-toolkit': path.resolve(__dirname, '../ui-toolkit')
-    }
+      'ui-toolkit': path.resolve(__dirname, '../ui-toolkit/src')
+    },
+    dedupe: ['react', 'react-dom']
   }
 });

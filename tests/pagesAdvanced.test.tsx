@@ -136,9 +136,7 @@ describe('Projects page edge cases', () => {
     ];
     render(<Projects />);
     expect(screen.getByText('My Project')).toBeInTheDocument();
-    const deleteBtn = screen
-      .getAllByRole('button')
-      .find((btn) => btn instanceof HTMLButtonElement && btn.querySelector('svg') && btn.closest('.grid-row'));
+    const deleteBtn = screen.getByLabelText('Delete project');
     if (!deleteBtn) throw new Error('delete button not found');
     const userProjects = userEvent.setup();
     await userProjects.click(deleteBtn);
@@ -157,9 +155,7 @@ describe('Projects page edge cases', () => {
     ];
     render(<Projects />);
     expect(screen.getByText('Fail')).toBeInTheDocument();
-    const deleteBtn = screen
-      .getAllByRole('button')
-      .find((btn) => btn instanceof HTMLButtonElement && btn.querySelector('svg') && btn.closest('.grid-row'));
+    const deleteBtn = screen.getByLabelText('Delete project');
     if (!deleteBtn) throw new Error('delete button not found');
     const userProjects = userEvent.setup();
     await userProjects.click(deleteBtn);
@@ -184,7 +180,6 @@ describe('Grid component', () => {
       <Grid
         items={[]}
         loading
-        searchPlaceholder="Search"
         renderPrefix={<div>prefix</div>}
         renderSuffix={<div>suffix</div>}
       />

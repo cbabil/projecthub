@@ -1,9 +1,8 @@
 import { FileJson } from 'lucide-react';
 import React from 'react';
+import { DataGrid, type DataGridProps } from 'ui-toolkit';
 
 import { TEMPLATES_PER_PAGE } from '../hooks/useTemplateSelection.js';
-import DataGrid from './DataGrid.js';
-import type { DataGridProps } from './DataGrid.types.js';
 import EmptyState from './EmptyState.js';
 
 export type TemplateStepLabels = {

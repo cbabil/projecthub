@@ -64,19 +64,6 @@ body {
   -webkit-app-region: no-drag;
 }
 
-.grid-row {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  transition: background-color 150ms ease, color 150ms ease;
-}
-
-.grid-row:hover {
-  background-color: color-mix(in srgb, var(--color-accent-primary) 18%, transparent);
-}
-
-.grid-row--selected {
-  background-color: color-mix(in srgb, var(--color-accent-primary) 32%, transparent);
-}
-
 /* Animation system */
 @keyframes slide-in {
   from {

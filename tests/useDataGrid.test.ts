@@ -1,10 +1,9 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { useDataGrid, type GridColumn } from 'ui-toolkit';
 
-import { useDataGrid } from '../src/renderer/hooks/useDataGrid.js';
-
-const columns = [
-  { id: 'name', label: 'Name', accessor: (row: any) => row.name, sortable: true, sortValue: (row: any) => row.name }
+const columns: GridColumn<{ name: string }>[] = [
+  { id: 'name', label: 'Name', accessor: (row) => row.name, sortable: true, sortValue: (row) => row.name }
 ];
 
 const rows = [{ name: 'Bravo' }, { name: 'Alpha' }, { name: 'Charlie' }];

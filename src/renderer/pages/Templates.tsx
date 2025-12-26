@@ -12,7 +12,7 @@ import { useData } from '../context/DataContext.js';
 import { useToast } from '../context/ToastContext.js';
 import { useTranslation } from '../context/TranslationContext.js';
 import { safeIpc, safeIpcVoid } from '../utils/ipc.js';
-import { buildTemplatesColumns } from './TemplatesColumns.js';
+import { buildTemplatesRowMapper,templatesColumns } from './TemplatesColumns.js';
 
 const Templates: React.FC = () => {
   const { filteredTemplates, loading } = useData();
@@ -93,18 +93,17 @@ const Templates: React.FC = () => {
     });
   }, [toast]);
 
-  const columns = useMemo(
-    () => buildTemplatesColumns({ onView: handleSelect, onEdit: handleEdit, onDelete: handleDelete }),
+  const rowMapper = useMemo(
+    () => buildTemplatesRowMapper({ onView: handleSelect, onEdit: handleEdit, onDelete: handleDelete }),
     [handleDelete, handleEdit, handleSelect]
   );
 
   return (
     <div className="min-h-full flex flex-col space-y-4 flex-1">
-      <Grid
+      <Grid<TemplateMeta>
         items={filteredTemplates}
         onSelect={handleSelect}
         loading={loading}
-        searchPlaceholder={t('templatesSearchPlaceholder')}
         emptyIcon={FileJson}
         emptyTitle={t('templatesEmptyTitle')}
         emptyMessage={t('templatesEmptyMessage')}
@@ -115,9 +114,9 @@ const Templates: React.FC = () => {
             Generate with AI
           </button>
         }
-        renderCategory={(item) => (item as TemplateMeta).category || 'templates'}
+        columns={templatesColumns}
+        rowMapper={rowMapper}
         pageSize={10}
-        columns={columns}
         fillContainer
       />
       {selected && (
