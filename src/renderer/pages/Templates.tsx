@@ -112,7 +112,7 @@ const Templates: React.FC = () => {
         renderSuffix={
           <button
             onClick={handleAIClick}
-            className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-600 to-brand-accent-primary text-white rounded-lg flex items-center gap-2 shadow-lg shadow-purple-500/25 transition-all duration-200 hover:scale-105 hover:shadow-xl hover:shadow-purple-500/40 hover:brightness-110 active:scale-100"
+            className="px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-600 to-brand-accent-primary text-white rounded-lg flex items-center gap-2 shadow-lg shadow-purple-500/25 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-xl hover:shadow-purple-500/50 hover:from-purple-500 hover:to-[#7b6bfd] active:translate-y-0"
           >
             <Sparkles size={16} />
             Generate with AI
