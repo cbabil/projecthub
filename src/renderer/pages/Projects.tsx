@@ -103,7 +103,7 @@ const Projects: React.FC = () => {
         emptyTitle={t('projectsEmptyTitle')}
         emptyMessage={t('projectsEmptyMessage')}
         renderPrefix={<h2 className="text-lg font-semibold">{t('projectsTitle')}</h2>}
-        renderSuffix={<Button onClick={() => setWizardOpen(true)}>{t('projectsNewButton')}</Button>}
+        renderSuffix={<Button size="sm" onClick={() => setWizardOpen(true)}>{t('projectsNewButton')}</Button>}
         columns={columns}
         pageSize={10}
         fillContainer

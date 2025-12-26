@@ -107,7 +107,7 @@ const Libraries: React.FC = () => {
         emptyMessage={t('librariesEmptyMessage')}
         renderPrefix={<h2 className="text-lg font-semibold">{t('librariesTitle')}</h2>}
         renderSuffix={
-          <Button onClick={handleAIClick}>
+          <Button size="sm" onClick={handleAIClick}>
             <Sparkles size={16} />
             Generate with AI
           </Button>
