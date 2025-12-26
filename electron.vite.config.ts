@@ -46,7 +46,8 @@ export default defineConfig({
     resolve: {
       alias: {
         '@renderer': path.resolve(__dirname, 'src/renderer'),
-        '@shared': path.resolve(__dirname, 'src/shared')
+        '@shared': path.resolve(__dirname, 'src/shared'),
+        'ui-toolkit': path.resolve(__dirname, '../ui-toolkit')
       }
     },
     build: {

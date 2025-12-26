@@ -12,7 +12,7 @@ import { useData } from '../context/DataContext.js';
 import { useToast } from '../context/ToastContext.js';
 import { useTranslation } from '../context/TranslationContext.js';
 import { safeIpc, safeIpcVoid } from '../utils/ipc.js';
-import { buildLibrariesColumns } from './LibrariesColumns.js';
+import { buildLibrariesRowMapper,librariesColumns } from './LibrariesColumns.js';
 
 const Libraries: React.FC = () => {
   const { libraries, loading, refreshAll } = useData();
@@ -89,34 +89,30 @@ const Libraries: React.FC = () => {
     });
   }, [toast]);
 
-  const columns = useMemo(
-    () => buildLibrariesColumns({ onView: handleSelect, onEdit: handleEdit, onDelete: handleDelete }),
+  const rowMapper = useMemo(
+    () => buildLibrariesRowMapper({ onView: handleSelect, onEdit: handleEdit, onDelete: handleDelete }),
     [handleDelete, handleEdit, handleSelect]
   );
 
   return (
     <div className="min-h-full flex flex-col space-y-4 flex-1">
-      <Grid
+      <Grid<LibraryMeta>
         items={libraries}
         onSelect={handleSelect}
         loading={loading}
-        searchPlaceholder={t('librariesSearchPlaceholder')}
         emptyIcon={Library}
         emptyTitle={t('librariesEmptyTitle')}
         emptyMessage={t('librariesEmptyMessage')}
         renderPrefix={<h2 className="text-lg font-semibold">{t('librariesTitle')}</h2>}
         renderSuffix={
-          <button
-            onClick={handleAIClick}
-            className="button-primary flex items-center gap-2 text-sm font-medium"
-          >
+          <button onClick={handleAIClick} className="button-primary flex items-center gap-2 text-sm">
             <Sparkles size={16} />
             Generate with AI
           </button>
         }
-        renderCategory={(item) => (item as LibraryMeta).category || 'library'}
+        columns={librariesColumns}
+        rowMapper={rowMapper}
         pageSize={10}
-        columns={columns}
         fillContainer
       />
       {selected && (

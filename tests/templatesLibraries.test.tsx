@@ -136,9 +136,7 @@ describe('Projects page', () => {
     ];
     render(<Projects />);
     expect(screen.getByText('Proj1')).toBeInTheDocument();
-    const deleteBtn = screen
-      .getAllByRole('button')
-      .find((btn) => btn instanceof HTMLButtonElement && btn.textContent === '' && btn.querySelector('svg'));
+    const deleteBtn = screen.getByLabelText('Delete project');
     if (!deleteBtn) throw new Error('Delete button not found');
     await user.click(deleteBtn);
     expect(window.projecthub.deleteProject).toHaveBeenCalled();

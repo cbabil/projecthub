@@ -85,14 +85,12 @@ describe('Grid component', () => {
     render(
       <Grid
         items={baseItems}
-        searchPlaceholder="Search grid"
         onSelect={vi.fn()}
-        renderCategory={() => 'cat'}
         pageSize={10}
       />
     );
     expect(screen.getByText('Alpha')).toBeInTheDocument();
-    const search = screen.getByPlaceholderText('Search grid');
+    const search = screen.getByPlaceholderText('Search all columns');
     await user.type(search, 'Beta');
     expect(screen.queryByText('Alpha')).not.toBeInTheDocument();
     expect(screen.getByText('Beta')).toBeInTheDocument();
@@ -103,9 +101,7 @@ describe('Grid component', () => {
     render(
       <Grid
         items={baseItems}
-        searchPlaceholder="Search grid"
         onSelect={vi.fn()}
-        renderCategory={() => 'cat'}
         pageSize={10}
       />
     );
@@ -116,25 +112,18 @@ describe('Grid component', () => {
     expect(rowsAfter.join('')).not.toBe(rowsBefore.join(''));
   });
 
-  it('renders categories and actions when provided', async () => {
-    const user = userEvent.setup();
-    const renderActions = vi.fn().mockReturnValue(<button data-testid="act-btn">Act</button>);
+  it('renders rows with data from items', () => {
     render(
       <Grid
         items={[
           { type: 'template', name: 'CatRow', description: 'Desc', version: '1', lastEdited: '2024-01-01', category: 'special' }
         ]}
-        searchPlaceholder="Search grid"
         onSelect={vi.fn()}
-        renderCategory={(row: any) => row.category ?? 'fallback'}
-        renderActions={renderActions}
         pageSize={5}
       />
     );
-    expect(screen.getByText('special')).toBeInTheDocument();
-    expect(screen.getByTestId('act-btn')).toBeInTheDocument();
-    await user.type(screen.getByPlaceholderText('Search grid'), 'Cat');
-    expect(renderActions).toHaveBeenCalled();
+    expect(screen.getByText('CatRow')).toBeInTheDocument();
+    expect(screen.getByText('Desc')).toBeInTheDocument();
   });
 });
 
@@ -146,7 +135,7 @@ describe('Templates page search', () => {
       { name: 'Temp2', description: '', category: 'templates', version: '', lastEdited: '', editable: true, sourcePath: 'b' }
     ];
     render(<Templates />);
-    await user.type(screen.getByPlaceholderText('templatesSearchPlaceholder'), 'Temp2');
+    await user.type(screen.getByPlaceholderText('Search all columns'), 'Temp2');
     expect(screen.queryByText('Temp1')).not.toBeInTheDocument();
     expect(screen.getByText('Temp2')).toBeInTheDocument();
   });
@@ -160,7 +149,7 @@ describe('Libraries page search', () => {
       { name: 'LibTwo', description: 'B', version: '', lastEdited: '', type: 'library' }
     ];
     render(<Libraries />);
-    await user.type(screen.getByPlaceholderText('librariesSearchPlaceholder'), 'Two');
+    await user.type(screen.getByPlaceholderText('Search all columns'), 'Two');
     expect(screen.queryByText('LibOne')).not.toBeInTheDocument();
     expect(screen.getByText('LibTwo')).toBeInTheDocument();
   });

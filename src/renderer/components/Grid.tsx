@@ -1,38 +1,33 @@
 import { BaseMeta } from '@shared/types';
 import { ArrowUpDown, LucideIcon } from 'lucide-react';
-import React, { useMemo } from 'react';
+import React, { ReactNode, useMemo } from 'react';
+import { Table, type TableColumn } from 'ui-toolkit';
 
-import type { GridColumn } from '../hooks/useDataGrid.js';
-import DataGrid from './DataGrid.js';
-import type { DataGridProps } from './DataGrid.types.js';
+import { formatDate, truncate } from '../utils/text.js';
 import EmptyState from './EmptyState.js';
-import { buildDefaultColumns } from './GridColumns.js';
 
 interface Props<T extends BaseMeta> {
   items: T[];
   onSelect?: (item: T) => void;
   loading?: boolean;
-  searchPlaceholder?: string;
   emptyIcon?: LucideIcon;
   emptyTitle?: string;
   emptyMessage?: string;
-  searchInsideCard?: boolean;
   renderPrefix?: React.ReactNode;
   renderSuffix?: React.ReactNode;
   renderCategory?: (item: T) => string | undefined;
   pageSize?: number;
-  enablePagination?: boolean;
   renderActions?: (item: T) => React.ReactNode;
-  searchPrefix?: React.ReactNode;
   fillContainer?: boolean;
-  columns?: GridColumn<T>[];
+  columns?: TableColumn[];
+  /** Custom row mapper for complex transformations */
+  rowMapper?: (item: T, index: number) => Record<string, ReactNode>;
 }
 
 const Grid = <T extends BaseMeta>({
   items,
   onSelect,
   loading,
-  searchPlaceholder,
   emptyIcon,
   emptyTitle,
   emptyMessage,
@@ -41,40 +36,65 @@ const Grid = <T extends BaseMeta>({
   renderCategory,
   pageSize = 10,
   renderActions,
-  searchPrefix,
   fillContainer = false,
   columns: overrideColumns,
-  enablePagination = true,
-  searchInsideCard = true
+  rowMapper
 }: Props<T>) => {
-  const columns = useMemo(
-    () => (overrideColumns ? overrideColumns : buildDefaultColumns(renderCategory, renderActions)),
-    [overrideColumns, renderActions, renderCategory]
-  );
+  // Build default columns if not overridden
+  const columns: TableColumn[] = useMemo(() => {
+    if (overrideColumns) return overrideColumns;
+    const base: TableColumn[] = [
+      { label: 'Name', value: 'name', sortable: true, width: '180px' },
+      { label: 'Description', value: 'description', sortable: true, width: '1fr' },
+      { label: 'Category', value: 'category', sortable: true, width: '160px' },
+      { label: 'Version', value: 'version', sortable: true, width: '90px' },
+      { label: 'Released On', value: 'releasedOn', sortable: true, width: '180px' }
+    ];
+    if (renderActions) {
+      base.push({ label: 'Actions', value: 'actions', sortable: false, width: '100px' });
+    }
+    return base;
+  }, [overrideColumns, renderActions]);
 
-  const filterRows = (row: T, query: string) => {
-    if (!query.trim()) return true;
-    const lower = query.toLowerCase();
-    const values = [row.name, row.description ?? '', row.version ?? '', row.lastEdited ?? '', renderCategory?.(row) ?? ''];
-    return values.some((value) => value.toLowerCase().includes(lower));
-  };
+  // Transform items to plain row objects for Table
+  const rows = useMemo(() => {
+    return items.map((item, idx) => {
+      // Use custom rowMapper if provided
+      if (rowMapper) {
+        const row = rowMapper(item, idx);
+        row.__index = idx;
+        return row;
+      }
 
-  const gridProps: DataGridProps<T> = {
-    rows: items,
-    columns,
-    getRowId: (row) => `${row.name}-${row.lastEdited ?? ''}`,
-    selectionMode: 'none',
-    enableSearch: true,
-    searchPlaceholder: searchPlaceholder ?? 'Search',
-    searchPrefix,
-    enablePagination,
-    searchInsideCard,
-    pageSize,
-    filterRows,
-    onRowClick: onSelect,
-    className: searchInsideCard ? 'app-surface' : undefined,
-    fillContainer
-  };
+      // Default transformation
+      const row: Record<string, React.ReactNode> = {
+        __index: idx,
+        name: item.name,
+        description: truncate(item.description ?? ''),
+        category: renderCategory?.(item) ?? '',
+        version: item.version ?? '—',
+        releasedOn: formatDate(item.lastEdited)
+      };
+      if (renderActions) {
+        row.actions = (
+          <div className="flex justify-center" onClick={(e) => e.stopPropagation()}>
+            {renderActions(item)}
+          </div>
+        );
+      }
+      return row;
+    });
+  }, [items, renderCategory, renderActions, rowMapper]);
+
+  // Handle row click - map back to original item
+  const handleRowClick = onSelect
+    ? (row: Record<string, React.ReactNode>) => {
+        const idx = row.__index as number;
+        if (idx !== undefined && items[idx]) {
+          onSelect(items[idx]);
+        }
+      }
+    : undefined;
 
   return (
     <div className={`flex flex-col ${fillContainer ? 'h-full gap-3' : 'space-y-3'}`}>
@@ -86,13 +106,16 @@ const Grid = <T extends BaseMeta>({
       )}
       <div className="flex-1">
         {items.length ? (
-          searchInsideCard ? (
-            <DataGrid {...gridProps} />
-          ) : (
-            <div className="app-surface p-4">
-              <DataGrid {...gridProps} />
-            </div>
-          )
+          <Table
+            columns={columns}
+            rows={rows}
+            globalSearch
+            showColumnControls
+            pageSize={pageSize}
+            sortable
+            onRowClick={handleRowClick}
+            className="app-surface"
+          />
         ) : (
           <div className="app-surface flex flex-col items-center justify-center h-full">
             <EmptyState

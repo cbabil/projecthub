@@ -2,10 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-
-import DataGrid from '../src/renderer/components/DataGrid.js';
-import DataGridRow from '../src/renderer/components/DataGridRow.js';
-import { Input } from 'ui-toolkit';
+import { DataGrid, Input, type GridColumn } from 'ui-toolkit';
 
 describe('Input component', () => {
   it('invokes onChange handler with new value', () => {
@@ -16,29 +13,34 @@ describe('Input component', () => {
   });
 });
 
-describe('DataGridRow selection', () => {
-  it('renders selection controls based on mode and toggles on click', () => {
-    const onToggle = vi.fn();
+describe('DataGrid row selection', () => {
+  const columns: GridColumn<{ name: string }>[] = [
+    { id: 'name', label: 'Name', accessor: (r) => r.name }
+  ];
+
+  it('renders selection controls and toggles on click', async () => {
+    const user = userEvent.setup();
+    const onSelectionChange = vi.fn();
     render(
-      <DataGridRow
-        row={{ name: 'Row' }}
-        rowId="1"
-        columns={[{ id: 'name', label: 'Name', accessor: (r) => r.name }]}
+      <DataGrid
+        rows={[{ name: 'Row' }]}
+        columns={columns}
+        getRowId={(r) => r.name}
         selectionMode="single"
-        isSelected={false}
-        gridTemplateColumns="auto 1fr"
-        onToggle={onToggle}
+        onSelectionChange={onSelectionChange}
+        enableSearch={false}
+        enablePagination={false}
       />
     );
-    fireEvent.click(screen.getByText('Row'));
-    expect(onToggle).toHaveBeenCalled();
+    await user.click(screen.getByText('Row'));
+    expect(onSelectionChange).toHaveBeenCalledWith(['Row']);
     expect(screen.getByRole('radio')).toBeInTheDocument();
   });
 });
 
 describe('DataGrid integration', () => {
-  const columns = [
-    { id: 'name', label: 'Name', accessor: (row: any) => row.name, sortable: true, sortValue: (row: any) => row.name }
+  const columns: GridColumn<{ name: string }>[] = [
+    { id: 'name', label: 'Name', accessor: (row) => row.name, sortable: true, sortValue: (row) => row.name }
   ];
 
   it('calls onRowClick when selectionMode is none', () => {
@@ -58,7 +60,7 @@ describe('DataGrid integration', () => {
     expect(onRowClick).toHaveBeenCalledWith(expect.objectContaining({ name: 'Alpha' }));
   });
 
-  it('shows filler rows to maintain height', () => {
+  it('shows empty message when no rows', () => {
     render(
       <DataGrid
         rows={[]}
@@ -91,9 +93,9 @@ describe('DataGrid integration', () => {
     );
     const firstRow = screen.getByText('One');
     await user.click(firstRow);
-    expect(firstRow.closest('.grid-row')?.classList.contains('grid-row--selected')).toBe(true);
+    expect(firstRow.closest('.ui-datagrid-row')?.classList.contains('ui-datagrid-row--selected')).toBe(true);
     await user.click(firstRow);
-    expect(firstRow.closest('.grid-row')?.classList.contains('grid-row--selected')).toBe(false);
+    expect(firstRow.closest('.ui-datagrid-row')?.classList.contains('ui-datagrid-row--selected')).toBe(false);
   });
 
   it('supports single selection mode', async () => {
