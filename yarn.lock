@@ -3581,11 +3581,6 @@ lucide-react@^0.425.0:
   resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.425.0.tgz#1215cd9c074a90ce3c6409f10ef9feda7ad44d4d"
   integrity sha512-3SmvUimOnrX5c9UeLwkWFh78qRtsOfVujJrSqYq0IDYvZGpFJpWxE1TgfqJXh9QnoZmQ6K7nWoxCbjYAO7rKfg==
 
-lucide-react@^0.556.0:
-  version "0.556.0"
-  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-0.556.0.tgz#aad61a065737aef30322695a11fd21c7542c71aa"
-  integrity sha512-iOb8dRk7kLaYBZhR2VlV1CeJGxChBgUthpSP8wom9jfj79qovgG6qcSdiy6vkoREKPnbUYzJsCn4o4PtG3Iy+A==
-
 lz-string@^1.5.0:
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/lz-string/-/lz-string-1.5.0.tgz#c1ab50f77887b712621201ba9fd4e3a6ed099941"
@@ -4931,12 +4926,6 @@ typescript@^5.3.3, typescript@^5.4.5:
   version "5.9.3"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.9.3.tgz#5b4f59e15310ab17a216f5d6cf53ee476ede670f"
   integrity sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==
-
-"ui-toolkit@file:../ui-toolkit":
-  version "0.0.2"
-  dependencies:
-    lucide-react "^0.556.0"
-    ui-toolkit "file:../../Library/Caches/Yarn/v6/npm-ui-toolkit-0.0.2-12612016-a9ae-481a-8a67-c2870e651577-1766763970821/node_modules/ui-toolkit"
 
 unbox-primitive@^1.1.0:
   version "1.1.0"

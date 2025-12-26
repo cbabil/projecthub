@@ -22,7 +22,8 @@ export default defineConfig({
       '@shared': path.resolve(__dirname, 'src/shared'),
       '@renderer': path.resolve(__dirname, 'src/renderer'),
       '@main': path.resolve(__dirname, 'src/main'),
-      '@preload': path.resolve(__dirname, 'src/preload')
+      '@preload': path.resolve(__dirname, 'src/preload'),
+      'ui-toolkit': path.resolve(__dirname, '../ui-toolkit')
     }
   }
 });

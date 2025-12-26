@@ -11,7 +11,8 @@
       "@shared/*": ["src/shared/*"],
       "@renderer/*": ["src/renderer/*"],
       "@main/*": ["src/main/*"],
-      "@preload/*": ["src/preload/*"]
+      "@preload/*": ["src/preload/*"],
+      "ui-toolkit": ["../ui-toolkit/dist"]
     },
     "baseUrl": "./",
     "isolatedModules": true,
