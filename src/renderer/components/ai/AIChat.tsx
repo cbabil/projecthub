@@ -13,13 +13,13 @@ interface Props {
 }
 
 const AIChat: React.FC<Props> = ({ onClose, onSaveTemplate, onCreateProject, initialContext }) => {
-  const { settings, messages, streaming, sendMessage, updateProvider } = useAI();
+  const { settings, messages, streaming, streamContent, sendMessage, updateProvider } = useAI();
   const [input, setInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, streaming]);
+  }, [messages, streaming, streamContent]);
 
   useEffect(() => {
     if (initialContext && messages.length === 0) {
@@ -83,8 +83,10 @@ const AIChat: React.FC<Props> = ({ onClose, onSaveTemplate, onCreateProject, ini
         ))}
         {streaming && (
           <div className="flex gap-2">
-            <Bot size={16} className="text-[#6a5afd] mt-1 animate-pulse" />
-            <div className="text-sm text-white/50">Thinking...</div>
+            <Bot size={16} className="text-[#6a5afd] mt-1 animate-pulse flex-shrink-0" />
+            <div className="max-w-[80%] text-sm rounded-lg px-3 py-2 bg-[#0f0f23] text-white/90">
+              {streamContent || 'Thinking...'}
+            </div>
           </div>
         )}
         <div ref={messagesEndRef} />

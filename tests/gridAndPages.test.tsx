@@ -48,6 +48,7 @@ vi.mock('../src/renderer/context/AIContext.js', () => ({
     settings: { provider: 'anthropic', anthropic: { apiKey: '', model: 'claude-sonnet-4-20250514' }, openai: { apiKey: '', model: 'gpt-4o' }, ollama: { endpoint: 'http://localhost:11434', model: 'llama3' } },
     messages: [],
     streaming: false,
+    streamContent: '',
     sendMessage: vi.fn(),
     clearChat: vi.fn(),
     testConnection: vi.fn(),

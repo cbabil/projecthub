@@ -1,6 +1,14 @@
 import type { AIMessage, AIProviderType, AISettings, AIStreamChunk } from '@shared/ai/types.js';
 import { DEFAULT_AI_SETTINGS } from '@shared/ai/types.js';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 
 import { useSettings } from './SettingsContext.js';
 
@@ -9,6 +17,7 @@ interface AIContextValue {
   isConfigured: boolean;
   messages: AIMessage[];
   streaming: boolean;
+  streamContent: string;
   sendMessage: (content: string) => Promise<void>;
   clearChat: () => void;
   testConnection: (provider: AIProviderType, apiKey: string) => Promise<boolean>;
@@ -22,6 +31,7 @@ export const AIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [messages, setMessages] = useState<AIMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [streamContent, setStreamContent] = useState('');
+  const streamContentRef = useRef('');
 
   const aiSettings = appSettings?.ai ?? DEFAULT_AI_SETTINGS;
   const isConfigured = Boolean(
@@ -34,13 +44,21 @@ export const AIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     const unsubscribe = window.projecthub.onAIStream((chunk: unknown) => {
       const c = chunk as AIStreamChunk;
       if (c.type === 'text') {
-        setStreamContent((prev) => prev + c.content);
+        streamContentRef.current += c.content;
+        setStreamContent(streamContentRef.current);
       } else if (c.type === 'done') {
-        setMessages((prev) => [...prev, { role: 'assistant', content: streamContent }]);
+        if (streamContentRef.current) {
+          setMessages((prev) => [...prev, { role: 'assistant', content: streamContentRef.current }]);
+        }
+        streamContentRef.current = '';
         setStreamContent('');
         setStreaming(false);
       } else if (c.type === 'error') {
-        setMessages((prev) => [...prev, { role: 'assistant', content: `Error: ${c.content}` }]);
+        const errorMsg = streamContentRef.current
+          ? `${streamContentRef.current}\n\n[Error: ${c.content}]`
+          : `Error: ${c.content}`;
+        setMessages((prev) => [...prev, { role: 'assistant', content: errorMsg }]);
+        streamContentRef.current = '';
         setStreamContent('');
         setStreaming(false);
       }
@@ -48,7 +66,7 @@ export const AIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     return () => {
       unsubscribe();
     };
-  }, [streamContent]);
+  }, []);
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -97,12 +115,23 @@ export const AIProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       isConfigured,
       messages,
       streaming,
+      streamContent,
       sendMessage,
       clearChat,
       testConnection,
       updateProvider
     }),
-    [aiSettings, isConfigured, messages, streaming, sendMessage, clearChat, testConnection, updateProvider]
+    [
+      aiSettings,
+      isConfigured,
+      messages,
+      streaming,
+      streamContent,
+      sendMessage,
+      clearChat,
+      testConnection,
+      updateProvider
+    ]
   );
 
   return <AIContext.Provider value={value}>{children}</AIContext.Provider>;
