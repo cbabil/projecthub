@@ -1,9 +1,8 @@
 import type { Marketplace } from '@shared/types';
 import { Plus } from 'lucide-react';
 import React, { useState } from 'react';
-import { Button, Input } from 'ui-toolkit';
+import { Button, Input, useToast } from 'ui-toolkit';
 
-import { useToast } from '../../context/ToastContext.js';
 import { deriveMarketplaceId, deriveMarketplaceName, resolveMarketplaceUrl } from '../../utils/marketplace.js';
 import MarketplaceRow from './MarketplaceRow.js';
 

@@ -1,12 +1,11 @@
 import { Loader2, RefreshCw, Store } from 'lucide-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Search } from 'ui-toolkit';
+import { Search, Typography, useToast } from 'ui-toolkit';
 
 import { PACK_CATEGORIES } from '../../shared/marketplace.constants.js';
 import MarketplaceFilters, { SortBy, StatusFilter } from '../components/MarketplaceFilters.js';
 import PackCard from '../components/PackCard.js';
 import { usePacks } from '../context/PacksContext.js';
-import { useToast } from '../context/ToastContext.js';
 
 const Marketplace: React.FC = () => {
   const { packs, refreshing, installingId, removingId, errors, refresh, installPack, removePack } = usePacks();
@@ -81,8 +80,8 @@ const Marketplace: React.FC = () => {
         <div className="flex items-center gap-3">
           <Store size={24} className="text-brand-accent-primary" />
           <div>
-            <h1 className="text-xl font-semibold text-white">Marketplace</h1>
-            <p className="text-sm text-brand-text-dark/60">Browse and install template packs</p>
+            <Typography variant="h1">Marketplace</Typography>
+            <Typography variant="small">Browse and install template packs</Typography>
           </div>
         </div>
         <button

@@ -1,8 +1,8 @@
 import { BadgeCheck, Check, Download, Info, Loader2, Package, Trash2 } from 'lucide-react';
 import React, { useRef, useState } from 'react';
+import { Popover } from 'ui-toolkit';
 
 import type { PackRow } from '../hooks/usePacksList.js';
-import Popover from './Popover.js';
 
 interface Props {
   pack: PackRow;

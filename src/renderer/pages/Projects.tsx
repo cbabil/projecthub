@@ -1,13 +1,12 @@
 import { ProjectMeta } from '@shared/types';
 import { Folder, Trash2 } from 'lucide-react';
 import React, { ReactNode, useMemo,useState } from 'react';
-import type { TableColumn } from 'ui-toolkit';
+import { Button, Modal, type TableColumn,Typography } from 'ui-toolkit';
+import { useToast } from 'ui-toolkit';
 
 import Grid from '../components/Grid.js';
-import Modal from '../components/Modal.js';
 import ProjectsWizard from '../components/ProjectsWizard.js';
 import { useData } from '../context/DataContext.js';
-import { useToast } from '../context/ToastContext.js';
 import { useTranslation } from '../context/TranslationContext.js';
 import { safeIpcVoid } from '../utils/ipc.js';
 import { formatDate, truncate } from '../utils/text.js';
@@ -74,14 +73,14 @@ const Projects: React.FC = () => {
         emptyIcon={Folder}
         emptyTitle={t('projectsEmptyTitle')}
         emptyMessage={t('projectsEmptyMessage')}
-        renderPrefix={<h2 className="text-lg font-semibold">{t('projectsTitle')}</h2>}
-        renderSuffix={<button className="button-primary text-sm" onClick={() => setWizardOpen(true)}>{t('projectsNewButton')}</button>}
+        renderPrefix={<Typography variant="title">{t('projectsTitle')}</Typography>}
+        renderSuffix={<Button size="sm" onClick={() => setWizardOpen(true)}>{t('projectsNewButton')}</Button>}
         columns={columns}
         rowMapper={rowMapper}
         pageSize={10}
         fillContainer
       />
-      <Modal open={wizardOpen} onClose={() => setWizardOpen(false)} title={t('projectsNewButton')}>
+      <Modal open={wizardOpen} onClose={() => setWizardOpen(false)} title={t('projectsNewButton')} size="lg">
         <ProjectsWizard onClose={() => setWizardOpen(false)} onCreated={refreshAll} />
       </Modal>
     </div>

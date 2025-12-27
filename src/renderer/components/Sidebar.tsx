@@ -1,5 +1,6 @@
 import { FileJson, Folder, Library, Store } from 'lucide-react';
 import React from 'react';
+import { Badge, SideMenu, type SideMenuItem } from 'ui-toolkit';
 
 import { useData } from '../context/DataContext.js';
 import { usePacks } from '../context/PacksContext.js';
@@ -35,90 +36,56 @@ const Sidebar: React.FC<Props> = ({ active, onSelect }) => {
     }
   };
 
+  const handleSelect = (value: string) => {
+    if (value === 'templates') {
+      setTemplateFilter(undefined);
+      logNav('templates');
+    } else if (value.startsWith('templates:')) {
+      const dir = value.replace('templates:', '');
+      setTemplateFilter(dir);
+      logNav('templates', { category: dir });
+    } else {
+      logNav(value as ProjectHubNav);
+    }
+    onSelect(value);
+  };
+
+  const items: SideMenuItem[] = [
+    { label: 'Projects', value: 'projects', icon: <Folder size={18} /> },
+    {
+      label: 'Templates',
+      value: 'templates',
+      icon: <FileJson size={18} />,
+      children: directories.map((dir) => ({
+        label: dir,
+        value: `templates:${dir}`,
+        icon: <Folder size={14} />
+      }))
+    },
+    { label: 'Libraries', value: 'libraries', icon: <Library size={18} /> }
+  ];
+
+  const footerItems: SideMenuItem[] = [
+    {
+      label: 'Marketplace',
+      value: 'marketplace',
+      icon: <Store size={18} />,
+      badge: updateCount > 0 ? (
+        <Badge variant="success" size="sm" circle>
+          {updateCount}
+        </Badge>
+      ) : undefined
+    }
+  ];
+
   return (
-    <aside className="w-56 bg-brand-surface-dark text-brand-text-dark p-4 pt-8 flex flex-col gap-3">
-      <button
-        className={`flex items-center gap-2 px-3 py-2 rounded-md text-left transition cursor-pointer ${
-          active === 'projects' ? 'bg-brand-accent-primary text-white' : 'hover:bg-brand-divider/30'
-        }`}
-        onClick={() => {
-          logNav('projects');
-          onSelect('projects');
-        }}
-      >
-        <Folder size={18} />
-        <span className="text-sm">Projects</span>
-      </button>
-
-      <div>
-        <button
-          className={`flex w-full items-center gap-2 px-3 py-2 rounded-md text-left transition cursor-pointer ${
-            active === 'templates' ? 'bg-brand-accent-primary text-white' : 'hover:bg-brand-divider/30 text-brand-text-dark/90'
-          }`}
-        onClick={() => {
-          setTemplateFilter(undefined);
-          logNav('templates');
-          onSelect('templates');
-        }}
-        >
-          <FileJson size={18} />
-          <span className="text-sm">Templates</span>
-        </button>
-        <div className="mt-1 pl-6 space-y-1">
-          {directories.map((dir) => (
-            <button
-              key={dir}
-              className={`flex items-center gap-2 text-xs px-2 py-1 rounded-md transition cursor-pointer ${
-                active === `templates:${dir}`
-                  ? 'bg-brand-accent-primary text-white'
-                  : 'hover:bg-brand-divider/10 text-brand-text-dark'
-              }`}
-              onClick={() => {
-                setTemplateFilter(dir);
-                logNav('templates', { category: dir });
-                onSelect(`templates:${dir}`);
-              }}
-            >
-              <Folder size={14} />
-              <span>{dir}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <button
-        className={`flex items-center gap-2 px-3 py-2 rounded-md text-left transition cursor-pointer ${
-          active === 'libraries' ? 'bg-brand-accent-primary text-white' : 'hover:bg-brand-divider/30'
-        }`}
-        onClick={() => {
-          logNav('libraries');
-          onSelect('libraries');
-        }}
-      >
-        <Library size={18} />
-        <span className="text-sm">Libraries</span>
-      </button>
-
-      <div className="mt-auto pt-4 border-t border-brand-divider/20">
-        <button
-          className={`flex w-full items-center gap-2 px-3 py-2 rounded-md text-left transition cursor-pointer ${
-            active === 'marketplace' ? 'bg-brand-accent-primary text-white' : 'hover:bg-brand-divider/30'
-          }`}
-          onClick={() => {
-            logNav('marketplace');
-            onSelect('marketplace');
-          }}
-        >
-          <Store size={18} />
-          <span className="text-sm">Marketplace</span>
-          {updateCount > 0 && (
-            <span className="ml-auto px-1.5 py-0.5 text-[10px] font-medium bg-amber-500 text-white rounded-full">
-              {updateCount}
-            </span>
-          )}
-        </button>
-      </div>
-    </aside>
+    <SideMenu
+      items={items}
+      footerItems={footerItems}
+      active={active}
+      onSelect={handleSelect}
+      className="bg-brand-surface-dark"
+    />
   );
 };
 

@@ -1,10 +1,9 @@
 import { BaseMeta } from '@shared/types';
 import { ArrowUpDown, LucideIcon } from 'lucide-react';
 import React, { ReactNode, useMemo } from 'react';
-import { Table, type TableColumn } from 'ui-toolkit';
+import { EmptyState, Table, type TableColumn } from 'ui-toolkit';
 
 import { formatDate, truncate } from '../utils/text.js';
-import EmptyState from './EmptyState.js';
 
 interface Props<T extends BaseMeta> {
   items: T[];

@@ -1,6 +1,7 @@
 import type { Marketplace } from '@shared/types';
 import { Package, Trash2 } from 'lucide-react';
 import React from 'react';
+import { Switch } from 'ui-toolkit';
 
 interface Props {
   marketplace: Marketplace;
@@ -19,11 +20,9 @@ const MarketplaceRow: React.FC<Props> = ({ marketplace, error, packCount, onTogg
       `}
     >
       <div className="flex items-center gap-3">
-        <input
-          type="checkbox"
+        <Switch
           checked={marketplace.enabled}
-          onChange={(e) => onToggle(e.target.checked)}
-          className="rounded accent-brand-accent-primary shrink-0"
+          onCheckedChange={onToggle}
         />
 
         <div className="flex-1 min-w-0" title={marketplace.url}>

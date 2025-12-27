@@ -33,13 +33,18 @@ vi.mock('../src/renderer/context/DataContext.js', () => ({
   useData: () => dataState
 }));
 
-// Mock ToastContext
+// Mock ui-toolkit Toast
 const mockAddToast = vi.fn();
-vi.mock('../src/renderer/context/ToastContext.js', () => ({
-  useToast: () => mockAddToast,
-  useToasts: () => ({ toasts: [], removeToast: vi.fn() }),
-  ToastProvider: ({ children }: { children: React.ReactNode }) => children
-}));
+vi.mock('ui-toolkit', async (importOriginal) => {
+  const actual = await importOriginal() as Record<string, unknown>;
+  return {
+    ...actual,
+    useToast: () => mockAddToast,
+    useToasts: () => ({ toasts: [], removeToast: vi.fn() }),
+    ToastProvider: ({ children }: { children: React.ReactNode }) => children,
+    ToastContainer: () => null
+  };
+});
 
 // Mock AIContext
 vi.mock('../src/renderer/context/AIContext.js', () => ({

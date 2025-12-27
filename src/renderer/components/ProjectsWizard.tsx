@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Stepper } from 'ui-toolkit';
 
 import type { TranslationKeys } from '../../i18n';
 import { useTranslation } from '../context/TranslationContext.js';
@@ -6,7 +7,6 @@ import { useProjectsWizard } from '../hooks/useProjectsWizard.js';
 import ProjectsWizardContent from './ProjectsWizardContent.js';
 import ProjectsWizardFooter from './ProjectsWizardFooter.js';
 import { buildBasicsProps, buildLibrariesProps, buildReviewProps, buildTemplateProps } from './ProjectsWizardProps.js';
-import StepperProgress from './StepperProgress.js';
 
 interface Props {
   onClose: () => void;
@@ -94,7 +94,7 @@ const ProjectsWizard: React.FC<Props> = ({ onClose, onCreated }) => {
   return (
     <div className="space-y-6 flex flex-col h-full">
       <div className="shrink-0">
-        <StepperProgress steps={stepLabels} currentIndex={step} />
+        <Stepper steps={stepLabels.map(label => ({ label }))} currentIndex={step} />
       </div>
       <div className="flex-1 min-h-0 pr-1 pt-3 sm:pt-5">
         <ProjectsWizardContent

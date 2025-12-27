@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { Modal } from 'ui-toolkit';
 
-import Modal from './components/Modal.js';
 import SettingsModalContent from './components/settings/SettingsModalContent.js';
 import Sidebar from './components/Sidebar.js';
 import TitleBar from './components/TitleBar.js';
@@ -57,7 +57,7 @@ const App: React.FC = () => {
           </Suspense>
         </section>
       </main>
-      <Modal open={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} title="Settings">
+      <Modal open={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} title="Settings" size="lg">
         <SettingsModalContent open={settingsModalOpen} />
       </Modal>
     </div>

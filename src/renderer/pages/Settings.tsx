@@ -1,9 +1,9 @@
 import type { PackMeta } from '@shared/types.js';
 import React, { useEffect, useState } from 'react';
-import { Button, Input } from 'ui-toolkit';
+import { Button, Checkbox, Input } from 'ui-toolkit';
+import { useToast } from 'ui-toolkit';
 
 import { useSettings } from '../context/SettingsContext.js';
-import { useToast } from '../context/ToastContext.js';
 import { useTranslation } from '../context/TranslationContext.js';
 
 const accents = ['primary', 'boost', 'blue', 'green', 'red'] as const;
@@ -64,14 +64,11 @@ const SettingsPage: React.FC = () => {
         </label>
       </div>
 
-      <label className="flex items-center gap-2 text-sm text-brand-text-dark/80">
-        <input
-          type="checkbox"
-          checked={settings.enforceLineLimit}
-          onChange={(e) => update({ ...settings, enforceLineLimit: e.target.checked })}
-        />
-        {t('settingsLineLimitLabel')}
-      </label>
+      <Checkbox
+        checked={settings.enforceLineLimit}
+        onCheckedChange={(checked) => update({ ...settings, enforceLineLimit: checked })}
+        label={t('settingsLineLimitLabel')}
+      />
 
       <div className="space-y-2 text-sm">
         <p className="text-brand-text-dark/80">{t('settingsDataFolderLabel')}</p>

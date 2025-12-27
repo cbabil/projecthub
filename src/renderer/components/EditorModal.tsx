@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react';
-
-import Modal from './Modal.js';
+import { Button, Modal } from 'ui-toolkit';
 
 interface Props {
   open: boolean;
@@ -19,40 +18,38 @@ const EditorModal: React.FC<Props> = ({ open, onClose, title, value, editable, o
   const footer =
     editable && onSave
       ? (
-          <div className="flex items-center gap-3">
-            <button
-              className="button-primary"
-              onClick={() => {
-                onSave(current);
-                onClose();
-              }}
-            >
-              Save
-            </button>
-          </div>
+          <Button
+            onClick={() => {
+              onSave(current);
+              onClose();
+            }}
+          >
+            Save
+          </Button>
         )
-      : languageLabel
-        ? <span className="px-1 py-[0.5px] leading-none rounded-[3px] text-[9px] uppercase tracking-wide bg-[#dc2626] text-white/90">{languageLabel}</span>
-        : null;
+      : null;
+
+  const titleContent = (
+    <span className="flex items-center gap-2">
+      <span className="truncate">{title}</span>
+      {languageLabel && (
+        <span className="px-1 py-[0.5px] leading-none rounded-[3px] text-[9px] uppercase tracking-wide bg-[#dc2626] text-white/90">
+          {languageLabel}
+        </span>
+      )}
+    </span>
+  );
 
   return (
     <Modal
       open={open}
       onClose={onClose}
-      title={
-        <span className="flex items-center gap-2">
-          <span className="truncate">{title}</span>
-          {languageLabel && (
-            <span className="px-1 py-[0.5px] leading-none rounded-[3px] text-[9px] uppercase tracking-wide bg-[#dc2626] text-white/90">
-              {languageLabel}
-            </span>
-          )}
-        </span>
-      }
+      title={titleContent}
       footer={footer}
+      size="lg"
     >
       <textarea
-        className={`w-full h-[55vh] min-h-[260px] max-h-[60vh] text-brand-text-dark text-xs font-mono rounded-md p-3 resize-none outline-none shadow-none focus:ring-2 focus:ring-brand-accent-primary/60 border-0 ${
+        className={`w-full flex-1 text-brand-text-dark text-xs font-mono rounded-md p-3 resize-none outline-none shadow-none focus:ring-2 focus:ring-brand-accent-primary/60 border-0 ${
           editable ? 'bg-[#0d0d1a]' : 'bg-transparent'
         }`}
         readOnly={!editable}

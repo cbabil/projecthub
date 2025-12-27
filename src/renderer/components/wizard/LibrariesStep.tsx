@@ -1,8 +1,6 @@
 import { Library } from 'lucide-react';
 import React from 'react';
-import { Search } from 'ui-toolkit';
-
-import EmptyState from '../EmptyState.js';
+import { Checkbox, EmptyState, Search } from 'ui-toolkit';
 
 type Props = {
   libraries: { name: string }[];
@@ -24,10 +22,12 @@ const LibrariesStep: React.FC<Props> = ({ libraries, selected, query, searchPlac
       <div className="flex-1 overflow-auto pr-1">
         <div className="flex flex-col gap-2">
           {libraries.map((lib) => (
-            <label key={lib.name} className="flex items-center gap-2 text-sm">
-              <input type="checkbox" checked={selected.includes(lib.name)} onChange={() => onToggle(lib.name)} />
-              {lib.name}
-            </label>
+            <Checkbox
+              key={lib.name}
+              checked={selected.includes(lib.name)}
+              onCheckedChange={() => onToggle(lib.name)}
+              label={lib.name}
+            />
           ))}
         </div>
       </div>
