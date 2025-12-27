@@ -14,6 +14,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Clone ui-toolkit
+        run: git clone --depth 1 https://github.com/cbabil/ui-toolkit.git ../ui-toolkit
+
       - name: Use Node 22
         uses: actions/setup-node@v4
         with:
@@ -22,6 +25,12 @@ jobs:
 
       - name: Enable corepack
         run: corepack enable
+
+      - name: Build ui-toolkit
+        run: |
+          cd ../ui-toolkit
+          yarn install --frozen-lockfile
+          yarn build:lib
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile

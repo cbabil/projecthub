@@ -9,7 +9,6 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
       tag: ${{ steps.version.outputs.tag }}
-      notes: ${{ steps.notes.outputs.notes }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -23,7 +22,6 @@ jobs:
           echo "tag=v$VERSION" >> $GITHUB_OUTPUT
 
       - name: Generate release notes
-        id: notes
         run: |
           LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
           if [ -z "$LAST_TAG" ]; then
@@ -32,9 +30,9 @@ jobs:
             RANGE="${LAST_TAG}..HEAD"
           fi
 
-          {
-            echo "notes<<EOF"
+          VERSION=$(node -p "require('./package.json').version")
 
+          {
             FEATURES=$(git log $RANGE --pretty=format:"- %s" --grep="^feat" 2>/dev/null || true)
             if [ -n "$FEATURES" ]; then
               echo "## Features"
@@ -66,12 +64,16 @@ jobs:
             echo "---"
             echo ""
             echo "## Assets"
-            echo "- **macOS**: ProjectHub-macos-v${{ steps.version.outputs.version }}.zip (DMG)"
-            echo "- **Windows**: ProjectHub-windows-v${{ steps.version.outputs.version }}.zip (Setup.exe)"
-            echo "- **Linux**: ProjectHub-linux-v${{ steps.version.outputs.version }}.zip (AppImage)"
+            echo "- **macOS**: ProjectHub-macos-v${VERSION}.zip (DMG)"
+            echo "- **Windows**: ProjectHub-windows-v${VERSION}.zip (Setup.exe)"
+            echo "- **Linux**: ProjectHub-linux-v${VERSION}.zip (AppImage)"
+          } > release-notes.md
 
-            echo "EOF"
-          } >> $GITHUB_OUTPUT
+      - name: Upload release notes
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-notes
+          path: release-notes.md
 
   build:
     needs: prepare
@@ -84,6 +86,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Clone ui-toolkit
+        run: git clone --depth 1 https://github.com/cbabil/ui-toolkit.git ../ui-toolkit
+
       - name: Use Node 22
         uses: actions/setup-node@v4
         with:
@@ -92,6 +97,12 @@ jobs:
 
       - name: Enable corepack
         run: corepack enable
+
+      - name: Build ui-toolkit
+        run: |
+          cd ../ui-toolkit
+          yarn install --frozen-lockfile
+          yarn build:lib
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -118,6 +129,12 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download release notes
+        uses: actions/download-artifact@v4
+        with:
+          name: release-notes
+          path: .
 
       - name: Download macOS artifacts
         uses: actions/download-artifact@v4
@@ -179,5 +196,5 @@ jobs:
           gh release create "$TAG" "${files[@]}" \
             --repo "$GITHUB_REPOSITORY" \
             --title "$TAG" \
-            --notes "${{ needs.prepare.outputs.notes }}" \
+            --notes-file release-notes.md \
             --latest
