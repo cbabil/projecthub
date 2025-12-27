@@ -2,6 +2,7 @@ import { AI_MODELS } from '@shared/ai/constants.js';
 import type { AIProviderType } from '@shared/ai/types.js';
 import { Bot, Send, User, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
+import { Dropdown } from 'ui-toolkit';
 
 import { useAI } from '../../context/AIContext.js';
 
@@ -48,18 +49,17 @@ const AIChat: React.FC<Props> = ({ onClose, onSaveTemplate, onCreateProject, ini
       <div className="flex items-center justify-between p-4 border-b border-white/10">
         <span className="text-sm font-medium text-white">AI Assistant</span>
         <div className="flex items-center gap-2">
-          <select
+          <Dropdown
             value={settings.provider}
-            onChange={(e) => updateProvider(e.target.value as AIProviderType)}
-            className="text-xs bg-[#0f0f23] border border-white/10 rounded-lg px-2 py-1 text-white focus:outline-none focus:border-[#6a5afd]/50"
-          >
-            {(Object.keys(AI_MODELS) as AIProviderType[]).map((p) => (
-              <option key={p} value={p}>
-                {p}
-              </option>
-            ))}
-            <option value="ollama">ollama</option>
-          </select>
+            onChange={(value) => updateProvider(value as AIProviderType)}
+            options={[
+              ...(Object.keys(AI_MODELS) as AIProviderType[]).map((p) => ({
+                value: p,
+                label: p
+              })),
+              { value: 'ollama', label: 'ollama' }
+            ]}
+          />
           <button onClick={onClose} className="text-white/60 hover:text-white transition-colors">
             <X size={18} />
           </button>

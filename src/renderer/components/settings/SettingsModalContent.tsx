@@ -1,7 +1,7 @@
 import type { Settings } from '@shared/types';
 import { FolderOpen } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Button } from 'ui-toolkit';
+import { Button, Tabs } from 'ui-toolkit';
 
 import pkg from '../../../../package.json';
 import { useSettings } from '../../context/SettingsContext.js';
@@ -99,29 +99,22 @@ const SettingsModalContent: React.FC<Props> = ({ open }) => {
     );
   }
 
-  const tabs: Array<{ id: 'general' | 'marketplace' | 'ai'; label: string }> = [
-    { id: 'general', label: 'Settings' },
-    { id: 'ai', label: 'AI' },
-    { id: 'marketplace', label: 'Marketplace' }
+  const tabItems = [
+    { value: 'general', label: 'Settings' },
+    { value: 'ai', label: 'AI' },
+    { value: 'marketplace', label: 'Marketplace' }
   ];
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex gap-1 mb-4 shrink-0">
-        {tabs.map(({ id, label }) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setTab(id)}
-            className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
-              tab === id
-                ? 'bg-brand-accent-primary text-white'
-                : 'text-white/60 hover:text-white hover:bg-white/5'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="mb-4 shrink-0">
+        <Tabs
+          items={tabItems}
+          active={tab}
+          onChange={(value) => setTab(value as 'general' | 'marketplace' | 'ai')}
+          variant="underline"
+          size="compact"
+        />
       </div>
       <div className="flex-1 min-h-0 overflow-hidden">
         {tab === 'general' ? (

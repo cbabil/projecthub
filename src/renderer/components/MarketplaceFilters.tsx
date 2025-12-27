@@ -1,4 +1,5 @@
 import React from 'react';
+import { Dropdown } from 'ui-toolkit';
 
 import CategoryFilter from './CategoryFilter.js';
 
@@ -58,15 +59,15 @@ const MarketplaceFilters: React.FC<Props> = ({
 
     <div className="flex items-center gap-2 ml-auto">
       <span className="text-xs text-brand-text-dark/60">Sort:</span>
-      <select
+      <Dropdown
         value={sortBy}
-        onChange={(e) => onSortChange(e.target.value as SortBy)}
-        className="px-2 py-1 text-xs bg-white/5 border border-brand-divider/40 rounded text-brand-text-dark focus:outline-none focus:border-brand-accent-primary"
-      >
-        <option value="name">Name</option>
-        <option value="category">Category</option>
-        <option value="date">Release Date</option>
-      </select>
+        onChange={(value) => onSortChange(value as SortBy)}
+        options={[
+          { value: 'name', label: 'Name' },
+          { value: 'category', label: 'Category' },
+          { value: 'date', label: 'Release Date' }
+        ]}
+      />
     </div>
   </div>
 );

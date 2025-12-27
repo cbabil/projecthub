@@ -1,6 +1,7 @@
 import { LibraryMeta } from '@shared/types';
 import { Library, Sparkles } from 'lucide-react';
 import React, { useMemo, useState } from 'react';
+import { Typography, useToast } from 'ui-toolkit';
 import YAML from 'yaml';
 
 import AIChat from '../components/ai/AIChat.js';
@@ -9,7 +10,6 @@ import EditorModal from '../components/EditorModal.js';
 import Grid from '../components/Grid.js';
 import { useAI } from '../context/AIContext.js';
 import { useData } from '../context/DataContext.js';
-import { useToast } from '../context/ToastContext.js';
 import { useTranslation } from '../context/TranslationContext.js';
 import { safeIpc, safeIpcVoid } from '../utils/ipc.js';
 import { buildLibrariesRowMapper,librariesColumns } from './LibrariesColumns.js';
@@ -103,7 +103,7 @@ const Libraries: React.FC = () => {
         emptyIcon={Library}
         emptyTitle={t('librariesEmptyTitle')}
         emptyMessage={t('librariesEmptyMessage')}
-        renderPrefix={<h2 className="text-lg font-semibold">{t('librariesTitle')}</h2>}
+        renderPrefix={<Typography variant="title">{t('librariesTitle')}</Typography>}
         renderSuffix={
           <button onClick={handleAIClick} className="button-primary flex items-center gap-2 text-sm">
             <Sparkles size={16} />

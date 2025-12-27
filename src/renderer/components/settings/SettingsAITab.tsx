@@ -3,6 +3,7 @@ import type { AIProviderType, AISettings } from '@shared/ai/types.js';
 import { DEFAULT_AI_SETTINGS } from '@shared/ai/types.js';
 import { CheckCircle, Loader2, XCircle } from 'lucide-react';
 import React, { useState } from 'react';
+import { Dropdown, Input } from 'ui-toolkit';
 
 import { useSettings } from '../../context/SettingsContext.js';
 
@@ -43,15 +44,14 @@ const SettingsAITab: React.FC = () => {
     <div className="space-y-6 text-sm">
       <section>
         <h3 className="text-xs font-medium text-white/50 uppercase tracking-wide mb-3">Provider</h3>
-        <select
+        <Dropdown
           value={ai.provider}
-          onChange={(e) => handleProviderChange(e.target.value as AIProviderType)}
-          className="input w-full"
-        >
-          {(Object.keys(AI_PROVIDER_INFO) as AIProviderType[]).map((p) => (
-            <option key={p} value={p}>{AI_PROVIDER_INFO[p].name}</option>
-          ))}
-        </select>
+          onChange={(value) => handleProviderChange(value as AIProviderType)}
+          options={(Object.keys(AI_PROVIDER_INFO) as AIProviderType[]).map((p) => ({
+            value: p,
+            label: AI_PROVIDER_INFO[p].name
+          }))}
+        />
       </section>
 
       {(['anthropic', 'openai'] as const).map((provider) => (
@@ -74,22 +74,20 @@ const SettingsAITab: React.FC = () => {
             </div>
           </div>
           <div className="space-y-2">
-            <input
+            <Input
               type="password"
               value={ai[provider].apiKey}
-              onChange={(e) => handleKeyChange(provider, e.target.value)}
+              onChange={(value) => handleKeyChange(provider, value)}
               placeholder="API Key"
-              className="input w-full"
             />
-            <select
+            <Dropdown
               value={ai[provider].model}
-              onChange={(e) => handleModelChange(provider, e.target.value)}
-              className="input w-full"
-            >
-              {AI_MODELS[provider].map((m) => (
-                <option key={m.id} value={m.id}>{m.name}</option>
-              ))}
-            </select>
+              onChange={(value) => handleModelChange(provider, value)}
+              options={AI_MODELS[provider].map((m) => ({
+                value: m.id,
+                label: m.name
+              }))}
+            />
           </div>
         </section>
       ))}
@@ -113,19 +111,15 @@ const SettingsAITab: React.FC = () => {
           </div>
         </div>
         <div className="space-y-2">
-          <input
-            type="text"
+          <Input
             value={ai.ollama.endpoint}
-            onChange={(e) => handleOllamaChange('endpoint', e.target.value)}
+            onChange={(value) => handleOllamaChange('endpoint', value)}
             placeholder="http://localhost:11434"
-            className="input w-full"
           />
-          <input
-            type="text"
+          <Input
             value={ai.ollama.model}
-            onChange={(e) => handleOllamaChange('model', e.target.value)}
+            onChange={(value) => handleOllamaChange('model', value)}
             placeholder="llama3"
-            className="input w-full"
           />
         </div>
       </section>

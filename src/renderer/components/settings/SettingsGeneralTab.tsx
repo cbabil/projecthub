@@ -1,6 +1,7 @@
 import type { AccentColor, FontSize, Settings } from '@shared/types';
 import { Check } from 'lucide-react';
 import React from 'react';
+import { Dropdown, Switch } from 'ui-toolkit';
 
 const ACCENT_COLORS: Array<{ value: AccentColor; color: string }> = [
   { value: 'primary', color: '#6a5acd' },
@@ -86,41 +87,19 @@ const SettingsGeneralTab: React.FC<Props> = ({ settings, onUpdate }) => {
           {/* Line Limit Hints */}
           <div className="flex items-center justify-between">
             <span className="text-white/70">Line limit hints</span>
-            <button
-              type="button"
-              onClick={() => onUpdate('enforceLineLimit', !lineLimitHints)}
-              className={`relative w-10 h-5 rounded-full transition-colors ${
-                lineLimitHints ? 'bg-brand-accent-primary' : 'bg-white/20'
-              }`}
-              role="switch"
-              aria-checked={lineLimitHints}
-            >
-              <span
-                className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                  lineLimitHints ? 'left-5' : 'left-0.5'
-                }`}
-              />
-            </button>
+            <Switch
+              checked={lineLimitHints}
+              onCheckedChange={(checked) => onUpdate('enforceLineLimit', checked)}
+            />
           </div>
 
           {/* Reduce Motion */}
           <div className="flex items-center justify-between">
             <span className="text-white/70">Reduce motion</span>
-            <button
-              type="button"
-              onClick={() => onUpdate('reduceMotion', !reduceMotion)}
-              className={`relative w-10 h-5 rounded-full transition-colors ${
-                reduceMotion ? 'bg-brand-accent-primary' : 'bg-white/20'
-              }`}
-              role="switch"
-              aria-checked={reduceMotion}
-            >
-              <span
-                className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-transform ${
-                  reduceMotion ? 'left-5' : 'left-0.5'
-                }`}
-              />
-            </button>
+            <Switch
+              checked={reduceMotion}
+              onCheckedChange={(checked) => onUpdate('reduceMotion', checked)}
+            />
           </div>
         </div>
       </section>
@@ -128,17 +107,11 @@ const SettingsGeneralTab: React.FC<Props> = ({ settings, onUpdate }) => {
       {/* Language Section */}
       <section>
         <h3 className="text-xs font-medium text-white/50 uppercase tracking-wide mb-3">Language</h3>
-        <select
-          className="input w-full"
+        <Dropdown
+          options={LANGUAGE_OPTIONS}
           value={settings.language ?? 'en'}
-          onChange={(e) => onUpdate('language', e.target.value)}
-        >
-          {LANGUAGE_OPTIONS.map(({ value, label }) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+          onChange={(value) => onUpdate('language', value)}
+        />
       </section>
 
     </div>

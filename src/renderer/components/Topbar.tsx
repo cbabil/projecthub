@@ -1,4 +1,5 @@
 import React from 'react';
+import { Typography } from 'ui-toolkit';
 
 import { useSettings } from '../context/SettingsContext.js';
 
@@ -12,11 +13,11 @@ const Topbar: React.FC<Props> = ({ title, actions }) => {
   return (
     <header className="flex items-center justify-between px-4 py-3 border-b border-brand-divider/50 bg-brand-surface-dark/80 sticky top-0 z-10">
       <div>
-        <p className="text-xs text-brand-text-dark/60">Workspace</p>
-        <h1 className="text-xl font-semibold">{title}</h1>
+        <Typography variant="caption" as="p">Workspace</Typography>
+        <Typography variant="h1">{title}</Typography>
       </div>
-      <div className="flex items-center gap-3 text-sm">
-        {settings && <span className="text-brand-text-dark/70">v{settings.appVersion}</span>}
+      <div className="flex items-center gap-3">
+        {settings && <Typography variant="small">v{settings.appVersion}</Typography>}
         {actions}
       </div>
     </header>

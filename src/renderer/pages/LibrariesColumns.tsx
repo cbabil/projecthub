@@ -13,11 +13,11 @@ interface ActionHandlers {
 
 /** Column definitions for Libraries page grid */
 export const librariesColumns: TableColumn[] = [
-  { label: 'Name', value: 'name', sortable: true, width: '140px' },
-  { label: 'Description', value: 'description', sortable: true, width: '1fr' },
-  { label: 'Category', value: 'category', sortable: true, width: '110px' },
-  { label: 'Version', value: 'version', sortable: true, width: '80px' },
-  { label: 'Last Edited', value: 'lastEdited', sortable: true, width: '130px' },
+  { label: 'Name', value: 'name', sortable: true, width: 'minmax(180px, 1fr)' },
+  { label: 'Description', value: 'description', sortable: true, width: 'minmax(300px, 2fr)' },
+  { label: 'Category', value: 'category', sortable: true, width: 'minmax(110px, 1fr)' },
+  { label: 'Version', value: 'version', sortable: true, width: 'minmax(120px, 1fr)' },
+  { label: 'Last Edited', value: 'lastEdited', sortable: true, width: 'minmax(180px, 1fr)' },
   { label: 'Actions', value: 'actions', sortable: false, width: '100px' }
 ];
 

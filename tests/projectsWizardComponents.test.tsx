@@ -3,9 +3,10 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
+import { Stepper } from 'ui-toolkit';
+
 import ProjectsWizardContent from '../src/renderer/components/ProjectsWizardContent.js';
 import ProjectsWizardFooter from '../src/renderer/components/ProjectsWizardFooter.js';
-import StepperProgress from '../src/renderer/components/StepperProgress.js';
 import TemplateStep from '../src/renderer/components/TemplateStep.js';
 import { LibrariesStep, ReviewStep } from '../src/renderer/components/ProjectsWizardSteps.js';
 
@@ -248,9 +249,10 @@ describe('ProjectsWizardFooter', () => {
   });
 });
 
-describe('StepperProgress', () => {
+describe('Stepper', () => {
   it('marks active and completed steps', () => {
-    render(<StepperProgress steps={['One', 'Two', 'Three']} currentIndex={1} />);
+    const steps = [{ label: 'One' }, { label: 'Two' }, { label: 'Three' }];
+    render(<Stepper steps={steps} currentIndex={1} />);
     expect(screen.getByText('One')).toBeInTheDocument();
     expect(screen.getByText('Two')).toBeInTheDocument();
     expect(screen.getByText('Three')).toBeInTheDocument();

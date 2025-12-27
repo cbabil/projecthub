@@ -3,6 +3,7 @@ import type { AIProviderType } from '@shared/ai/types.js';
 import { DEFAULT_AI_SETTINGS } from '@shared/ai/types.js';
 import { ExternalLink, Loader2 } from 'lucide-react';
 import React, { useState } from 'react';
+import { Typography } from 'ui-toolkit';
 
 import { useAI } from '../../context/AIContext.js';
 import { useSettings } from '../../context/SettingsContext.js';
@@ -56,7 +57,7 @@ const AISetupWizard: React.FC<Props> = ({ onClose, onSuccess }) => {
     >
       <div className="bg-[#131328] border border-[#6a5afd]/70 rounded-2xl p-6 w-[500px] shadow-[0_24px_70px_rgba(0,0,0,0.65)]">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-white">Set Up AI</h2>
+          <Typography variant="h1">Set Up AI</Typography>
           <button
             onClick={onClose}
             className="text-2xl leading-none text-white/60 hover:text-white transition-colors"
@@ -66,7 +67,7 @@ const AISetupWizard: React.FC<Props> = ({ onClose, onSuccess }) => {
           </button>
         </div>
 
-        <p className="text-sm text-white/70 mb-4">Choose your AI provider:</p>
+        <Typography variant="small" as="p" className="mb-4">Choose your AI provider:</Typography>
 
         <div className="space-y-3 mb-5">
           {providers.map((p) => (

@@ -1,7 +1,7 @@
 import type { BaseMeta, Marketplace } from '@shared/types';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useToast } from 'ui-toolkit';
 
-import { useToast } from '../context/ToastContext.js';
 import { fetchAllMarketplaces, mergeWithInstalled, type PackRow as UtilPackRow } from '../utils/packs.js';
 import { isSameVersion } from '../utils/text.js';
 
