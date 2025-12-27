@@ -1,30 +1,80 @@
-name: Manual Release
+name: Release
 
 on:
   workflow_dispatch:
-    inputs:
-      tag:
-        description: "Release tag (e.g., v1.0.0)"
-        required: true
-      name:
-        description: "Release name (defaults to tag)"
-        required: false
 
 jobs:
-  get-version:
+  prepare:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      notes: ${{ steps.notes.outputs.notes }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Get version from package.json
         id: version
-        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "tag=v$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            RANGE="HEAD"
+          else
+            RANGE="${LAST_TAG}..HEAD"
+          fi
+
+          {
+            echo "notes<<EOF"
+
+            FEATURES=$(git log $RANGE --pretty=format:"- %s" --grep="^feat" 2>/dev/null || true)
+            if [ -n "$FEATURES" ]; then
+              echo "## Features"
+              echo "$FEATURES"
+              echo ""
+            fi
+
+            FIXES=$(git log $RANGE --pretty=format:"- %s" --grep="^fix" 2>/dev/null || true)
+            if [ -n "$FIXES" ]; then
+              echo "## Bug Fixes"
+              echo "$FIXES"
+              echo ""
+            fi
+
+            REFACTORS=$(git log $RANGE --pretty=format:"- %s" --grep="^refactor" 2>/dev/null || true)
+            if [ -n "$REFACTORS" ]; then
+              echo "## Refactoring"
+              echo "$REFACTORS"
+              echo ""
+            fi
+
+            OTHERS=$(git log $RANGE --pretty=format:"- %s" --grep="^chore\|^docs\|^style\|^test" 2>/dev/null || true)
+            if [ -n "$OTHERS" ]; then
+              echo "## Other Changes"
+              echo "$OTHERS"
+            fi
+
+            echo ""
+            echo "---"
+            echo ""
+            echo "## Assets"
+            echo "- **macOS**: ProjectHub-macos-v${{ steps.version.outputs.version }}.zip (DMG)"
+            echo "- **Windows**: ProjectHub-windows-v${{ steps.version.outputs.version }}.zip (Setup.exe)"
+            echo "- **Linux**: ProjectHub-linux-v${{ steps.version.outputs.version }}.zip (AppImage)"
+
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
 
   build:
-    needs: get-version
+    needs: prepare
     strategy:
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
@@ -32,8 +82,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Use Node 22
         uses: actions/setup-node@v4
@@ -59,40 +108,39 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: projecthub-${{ needs.get-version.outputs.version }}-${{ matrix.os }}
+          name: projecthub-${{ needs.prepare.outputs.version }}-${{ matrix.os }}
           path: release/**
 
   release:
-    needs: [get-version, build]
+    needs: [prepare, build]
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Checkout (for release notes template)
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Download macOS artifacts
         uses: actions/download-artifact@v4
         with:
-          name: projecthub-${{ needs.get-version.outputs.version }}-macos-latest
+          name: projecthub-${{ needs.prepare.outputs.version }}-macos-latest
           path: artifacts/macos
 
       - name: Download Windows artifacts
         uses: actions/download-artifact@v4
         with:
-          name: projecthub-${{ needs.get-version.outputs.version }}-windows-latest
+          name: projecthub-${{ needs.prepare.outputs.version }}-windows-latest
           path: artifacts/windows
 
       - name: Download Linux artifacts
         uses: actions/download-artifact@v4
         with:
-          name: projecthub-${{ needs.get-version.outputs.version }}-ubuntu-latest
+          name: projecthub-${{ needs.prepare.outputs.version }}-ubuntu-latest
           path: artifacts/linux
 
-      - name: Prepare upload zips (one per OS)
+      - name: Prepare upload zips
         shell: bash
         env:
-          VERSION: ${{ needs.get-version.outputs.version }}
+          VERSION: ${{ needs.prepare.outputs.version }}
         run: |
           set -euo pipefail
           rm -rf upload && mkdir -p upload
@@ -114,38 +162,22 @@ jobs:
           pack artifacts/windows windows "*setup*.exe"
           pack artifacts/linux linux "*.appimage"
 
-      - name: Compose release notes
-        shell: bash
-        env:
-          VERSION: ${{ needs.get-version.outputs.version }}
-          TAG: ${{ github.event.inputs.tag }}
-        run: |
-          notes=$(< .github/release-notes-template.md)
-          notes=${notes//{{TAG}}/$TAG}
-          notes=${notes//{{VERSION}}/$VERSION}
-          printf "%s\n" "$notes" > release-notes.md
-
       - name: Create GitHub Release
-        shell: bash
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ needs.get-version.outputs.version }}
-          TAG: ${{ github.event.inputs.tag }}
-          RELEASE_NAME: ${{ github.event.inputs.name || format('v{0}', needs.get-version.outputs.version) }}
         run: |
-          set -euo pipefail
-          mapfile -t files < <(find upload -maxdepth 1 -type f -name '*.zip' | sort)
-          if [ ${#files[@]} -eq 0 ]; then
-            echo "No packaged artifacts found to upload" >&2
-            exit 1
-          fi
-          # If release exists, delete it (and the tag) to avoid duplicate assets
+          TAG="${{ needs.prepare.outputs.tag }}"
+
+          # Delete existing release if exists
           if gh release view "$TAG" >/dev/null 2>&1; then
             gh release delete "$TAG" -y
             git push origin :refs/tags/"$TAG" || true
           fi
+
+          # Create release
+          mapfile -t files < <(find upload -maxdepth 1 -type f -name '*.zip' | sort)
           gh release create "$TAG" "${files[@]}" \
             --repo "$GITHUB_REPOSITORY" \
-            --title "$RELEASE_NAME" \
-            --notes-file release-notes.md \
+            --title "$TAG" \
+            --notes "${{ needs.prepare.outputs.notes }}" \
             --latest
